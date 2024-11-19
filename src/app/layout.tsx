@@ -43,28 +43,12 @@ export default function RootLayout({
       >
         
       {/* Top Navigation */}
-      <header className="border-b">
+      <header className="w-full border-b">
         <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center justify-between">
-            <div className="flex items-center space-x-4">
-              <button className="font-bold text-xl" onClick={handleButtonClick}>agentscan</button>
-              <div className="flex items-center text-green-600">
-                <span>$OLAS: $1.24</span>
-                <ArrowUp className="h-4 w-4 ml-1" />
-                <span className="text-sm ml-1">2.5%</span>
-              </div>
-            </div>
-            <div className="flex items-center space-x-2 flex-1 max-w-xl mx-4">
-              <div className="relative flex-1">
-                <Search className="absolute left-2 top-2.5 h-4 w-4 text-muted-foreground" />
-                <Input
-                  placeholder="Search by agent ID / service name..."
-                  className="pl-8"
-                  value={searchQuery}
-                  onChange={(e) => setSearchQuery(e.target.value)}
-                />
-              </div>
-            </div>
+          <div className="flex items-center text-green-600">
+            <span className="font-medium">$OLAS: $1.24</span>
+            <ArrowUp className="h-4 w-4 ml-1" />
+            <span className="text-sm ml-1">2.5%</span>
           </div>
         </div>
       </header>

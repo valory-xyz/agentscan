@@ -9,7 +9,7 @@ import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 
-export default function AgentChat({ params = { id: '0' } }: { params?: { id: string } }) {
+export function BlockPage({ params = { id: '0' } }: { params?: { id: string } }) {
   const agentId = params.id || '0';
   const [query, setQuery] = useState('')
   const [messages, setMessages] = useState([
@@ -28,13 +28,13 @@ export default function AgentChat({ params = { id: '0' } }: { params?: { id: str
   const handleSubmit = (e: React.FormEvent) => {
     e.preventDefault()
     if (query.trim()) {
-      setMessages(prevMessages => [...prevMessages, { role: 'user', content: query }])
+      setMessages([...messages, { role: 'user', content: query }])
       setQuery('')
     }
   }
 
   const handleQuestionClick = (question: string) => {
-    setMessages(prevMessages => [...prevMessages, { role: 'user', content: question }])
+    setMessages([...messages, { role: 'user', content: question }])
   }
 
   useEffect(() => {

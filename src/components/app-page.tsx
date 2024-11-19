@@ -6,7 +6,7 @@ import { ArrowUp, ExternalLink, MessageSquare } from 'lucide-react'
 import { Button } from "@/components/ui/button"
 import { Card, CardContent } from "@/components/ui/card"
 
-export default function Home() {
+export function BlockPage() {
   const agents = [
     { id: 306, description: 'Prediction Market Oracle - Bought $5000 of Japan YES' },
     { id: 207, description: 'Sports Betting Agent - Placed 2.5 ETH on Lakers' },
@@ -24,6 +24,15 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
+      <header className="w-full border-b">
+        <div className="container mx-auto px-4 py-3">
+          <div className="flex items-center text-green-600">
+            <span className="font-medium">$OLAS: $1.24</span>
+            <ArrowUp className="h-4 w-4 ml-1" />
+            <span className="text-sm ml-1">2.5%</span>
+          </div>
+        </div>
+      </header>
       <main className="flex-grow flex flex-col items-center px-4 pt-8 pb-8">
         {/* Logo and Title */}
         <div className="text-center mb-8">
@@ -73,8 +82,8 @@ export default function Home() {
           <h3 className="text-2xl font-bold mb-6">Click to chat with an agent</h3>
           <div className="grid gap-4 grid-cols-1 sm:grid-cols-2 md:grid-cols-3 lg:grid-cols-4">
             {agents.map((agent) => (
-              <Link key={agent.id} href={`/agent/${agent.id}`}>
-                <Card className="hover:shadow-lg transition-shadow">
+              <Card key={agent.id} className="hover:shadow-lg transition-shadow">
+                <Link href={`/agent/${agent.id}`}>
                   <CardContent className="p-4">
                     <div className="flex items-center justify-between mb-2">
                       <h4 className="font-semibold">Agent #{agent.id}</h4>
@@ -84,8 +93,8 @@ export default function Home() {
                       {agent.description}
                     </p>
                   </CardContent>
-                </Card>
-              </Link>
+                </Link>
+              </Card>
             ))}
           </div>
         </div>
