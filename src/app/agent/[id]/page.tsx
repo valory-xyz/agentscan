@@ -1,16 +1,18 @@
 'use client'
 
+import React from 'react';
 import { useState, useRef, useEffect } from 'react'
 import Link from 'next/link'
 import { ArrowUp, Send } from 'lucide-react'
+import ReactMarkdown from 'react-markdown'
 
 import { Button } from "@/components/ui/button"
 import { Input } from "@/components/ui/input"
 import { Avatar, AvatarFallback } from "@/components/ui/avatar"
 import { Card, CardContent } from "@/components/ui/card"
 
-export default function AgentChat({ params = { id: '0' } }: { params?: { id: string } }) {
-  const agentId = params.id || '0';
+export default function AgentChat({ params }: { params?: { id: string } }) {
+  const agentId = React.use(params).id || '0';
   const [query, setQuery] = useState('')
   const [messages, setMessages] = useState([
     { role: 'assistant', content: `Hi there 👋 - this is Agent #${agentId}. What would you like to learn about me?` }
@@ -90,7 +92,7 @@ export default function AgentChat({ params = { id: '0' } }: { params?: { id: str
                           : 'bg-muted'
                       }`}
                     >
-                      <p>{message.content}</p>
+                      <ReactMarkdown>{message.content}</ReactMarkdown>
                     </div>
                   </div>
                 </div>
