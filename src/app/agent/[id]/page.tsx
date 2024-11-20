@@ -12,8 +12,6 @@ import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 
-// ... existing imports ...
-
 interface AgentMetadata {
   image?: string;
   operator?: string;
