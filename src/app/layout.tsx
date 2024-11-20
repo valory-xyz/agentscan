@@ -1,12 +1,8 @@
-'use client'
-import type { Metadata } from "next";
+"use client";
+
 import localFont from "next/font/local";
 import "./globals.css";
-import { ArrowUp, Search } from "lucide-react";
-import { Input } from "@/components/ui/input";
-import { useState } from "react";
-import { useRouter } from "next/navigation"
-
+import { ArrowUp } from "lucide-react";
 
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -29,30 +25,32 @@ export default function RootLayout({
 }: Readonly<{
   children: React.ReactNode;
 }>) {
-  const [searchQuery,setSearchQuery] = useState('')
-  const router = useRouter();
-
-  const handleButtonClick = () => {
-    router.push('/');
-  };
-
   return (
     <html lang="en">
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        
-      {/* Top Navigation */}
-      <header className="w-full border-b">
-        <div className="container mx-auto px-4 py-3">
-          <div className="flex items-center text-green-600">
-            <span className="font-medium">$OLAS: $1.24</span>
-            <ArrowUp className="h-4 w-4 ml-1" />
-            <span className="text-sm ml-1">2.5%</span>
+        {/* Top Navigation */}
+        <header className="w-full border-b">
+          <div className="container mx-auto px-4 py-3">
+            <div className="flex items-center text-green-600">
+              <span className="font-medium">$OLAS: $1.24</span>
+              <ArrowUp className="h-4 w-4 ml-1" />
+              <span className="text-sm ml-1">2.5%</span>
+            </div>
           </div>
-        </div>
-      </header>
+        </header>
         {children}
+        <footer className="w-full py-4 bg-muted/50 mt-auto">
+          <div className="container mx-auto px-4 text-center">
+            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
+              agentscan is a community-driven informational site separate to
+              Autonolas (OLAS), Valory AG or any related products & services.
+              All information and chats are not financial advice. Use at your
+              own risk.
+            </p>
+          </div>
+        </footer>
       </body>
     </html>
   );

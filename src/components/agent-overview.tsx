@@ -1,51 +1,64 @@
-'use client'
+"use client";
 
-import Link from "next/link"
-import { ArrowUp, ArrowUpRight, ExternalLink, History, MessageSquare, Search, Send, ThumbsDown, ThumbsUp, Volume2, Wallet, Atom } from 'lucide-react'
-import { useState, useRef, useEffect } from "react"
-import { Line, LineChart, ResponsiveContainer, Tooltip, XAxis, YAxis } from "recharts"
+import Link from "next/link";
+import { ExternalLink, History, Send, Wallet, Atom } from "lucide-react";
+import { useState, useRef, useEffect } from "react";
+import {
+  Line,
+  LineChart,
+  ResponsiveContainer,
+  Tooltip,
+  XAxis,
+  YAxis,
+} from "recharts";
 
-import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar"
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
-import { Table, TableBody, TableCell, TableHead, TableHeader, TableRow } from "@/components/ui/table"
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs"
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
+import {
+  Table,
+  TableBody,
+  TableCell,
+  TableHead,
+  TableHeader,
+  TableRow,
+} from "@/components/ui/table";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 // Sample data for the value over time chart
 const chartData = Array.from({ length: 30 }, (_, i) => ({
   date: `${i + 1}d`,
-  value: 10 + Math.random() * 10
-}))
+  value: 10 + Math.random() * 10,
+}));
 
 export function AgentOverview() {
-  const [searchQuery, setSearchQuery] = useState("")
-  const [messageInput, setMessageInput] = useState("")
+  const [messageInput, setMessageInput] = useState("");
   const [messages, setMessages] = useState([
-    { role: 'assistant', content: 'Hi there! I\'m Agent #306. How can I help you today?' }
-  ])
-  const messagesEndRef = useRef<HTMLDivElement>(null)
+    {
+      role: "assistant",
+      content: "Hi there! I'm Agent #306. How can I help you today?",
+    },
+  ]);
+  const messagesEndRef = useRef<HTMLDivElement>(null);
 
   const suggestedPrompts = [
     "What was your most recent transaction?",
     "Describe your strategy",
-    "What was your most profitable trade?"
-  ]
+    "What was your most profitable trade?",
+  ];
 
   const sendMessage = (content: string) => {
-    setMessages([...messages, { role: 'user', content }])
-    setMessageInput("")
-  }
+    setMessages([...messages, { role: "user", content }]);
+    setMessageInput("");
+  };
 
   useEffect(() => {
-    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" })
-  }, [messages])
+    messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
+  }, [messages]);
 
   return (
     <div className="min-h-screen flex flex-col bg-background">
-
-   
-
       <main className="flex-grow container mx-auto px-4 py-8 flex flex-col">
         {/* Agent Header */}
         <div className="mb-8">
@@ -53,7 +66,11 @@ export function AgentOverview() {
             <div>
               <h1 className="text-2xl font-bold flex items-center gap-2 mb-2">
                 Agent #306
-                <Button variant="outline" size="sm" className="bg-purple-600 text-white hover:bg-purple-700">
+                <Button
+                  variant="outline"
+                  size="sm"
+                  className="bg-purple-600 text-white hover:bg-purple-700"
+                >
                   Clone <Atom className="ml-2 h-4 w-4" />
                 </Button>
               </h1>
@@ -97,19 +114,32 @@ export function AgentOverview() {
               <CardContent className="p-6 flex-grow flex flex-col">
                 <div className="flex-grow flex flex-col space-y-4 overflow-y-auto mb-4">
                   {messages.map((message, i) => (
-                    <div key={i} className={`flex ${message.role === 'user' ? 'justify-end' : 'justify-start'} ${i === 0 ? 'mb-6' : ''}`}>
-                      <div className={`flex items-start gap-2 max-w-[80%] ${message.role === 'user' ? 'flex-row-reverse' : ''}`}>
-                        {message.role === 'assistant' && (
+                    <div
+                      key={i}
+                      className={`flex ${
+                        message.role === "user"
+                          ? "justify-end"
+                          : "justify-start"
+                      } ${i === 0 ? "mb-6" : ""}`}
+                    >
+                      <div
+                        className={`flex items-start gap-2 max-w-[80%] ${
+                          message.role === "user" ? "flex-row-reverse" : ""
+                        }`}
+                      >
+                        {message.role === "assistant" && (
                           <Avatar className="h-8 w-8">
                             <AvatarImage src="/placeholder.svg" />
                             <AvatarFallback>A</AvatarFallback>
                           </Avatar>
                         )}
-                        <div className={`rounded-lg px-4 py-2 ${
-                          message.role === 'user' 
-                            ? 'bg-primary text-primary-foreground' 
-                            : 'bg-muted'
-                        }`}>
+                        <div
+                          className={`rounded-lg px-4 py-2 ${
+                            message.role === "user"
+                              ? "bg-primary text-primary-foreground"
+                              : "bg-muted"
+                          }`}
+                        >
                           <p>{message.content}</p>
                         </div>
                       </div>
@@ -140,7 +170,9 @@ export function AgentOverview() {
                     onChange={(e) => setMessageInput(e.target.value)}
                     className="flex-1"
                   />
-                  <Button onClick={() => messageInput && sendMessage(messageInput)}>
+                  <Button
+                    onClick={() => messageInput && sendMessage(messageInput)}
+                  >
                     <Send className="h-4 w-4" />
                   </Button>
                 </div>
@@ -175,7 +207,10 @@ export function AgentOverview() {
                         </TableCell>
                         <TableCell>{i + 1} mins ago</TableCell>
                         <TableCell>
-                          <Link href="#" className="flex items-center gap-1 text-blue-600 hover:underline">
+                          <Link
+                            href="#"
+                            className="flex items-center gap-1 text-blue-600 hover:underline"
+                          >
                             Japan YES Market
                             <ExternalLink className="h-3 w-3" />
                           </Link>
@@ -184,7 +219,9 @@ export function AgentOverview() {
                         <TableCell className="text-right">
                           <div className="flex flex-col items-end">
                             <span>2.5 ETH</span>
-                            <span className="text-sm text-muted-foreground">$4,700 USD</span>
+                            <span className="text-sm text-muted-foreground">
+                              $4,700 USD
+                            </span>
                           </div>
                         </TableCell>
                       </TableRow>
@@ -205,7 +242,10 @@ export function AgentOverview() {
                   <div className="space-y-4">
                     <div>
                       <h3 className="font-medium mb-2">Current Service</h3>
-                      <Link href="#" className="text-blue-600 hover:underline flex items-center gap-1">
+                      <Link
+                        href="#"
+                        className="text-blue-600 hover:underline flex items-center gap-1"
+                      >
                         Autonolas Prediction Market Service
                         <ExternalLink className="h-3 w-3" />
                       </Link>
@@ -224,9 +264,24 @@ export function AgentOverview() {
                     <div>
                       <h3 className="font-medium mb-2">Recent Apps</h3>
                       <div className="space-y-2">
-                        <Link href="#" className="block text-blue-600 hover:underline">Japan YES Market</Link>
-                        <Link href="#" className="block text-blue-600 hover:underline">US Election Markets</Link>
-                        <Link href="#" className="block text-blue-600 hover:underline">Sports Predictions</Link>
+                        <Link
+                          href="#"
+                          className="block text-blue-600 hover:underline"
+                        >
+                          Japan YES Market
+                        </Link>
+                        <Link
+                          href="#"
+                          className="block text-blue-600 hover:underline"
+                        >
+                          US Election Markets
+                        </Link>
+                        <Link
+                          href="#"
+                          className="block text-blue-600 hover:underline"
+                        >
+                          Sports Predictions
+                        </Link>
                       </div>
                     </div>
                   </div>
@@ -244,10 +299,10 @@ export function AgentOverview() {
                         <XAxis dataKey="date" />
                         <YAxis />
                         <Tooltip />
-                        <Line 
-                          type="monotone" 
-                          dataKey="value" 
-                          stroke="#8884d8" 
+                        <Line
+                          type="monotone"
+                          dataKey="value"
+                          stroke="#8884d8"
                           strokeWidth={2}
                           dot={false}
                         />
@@ -261,5 +316,5 @@ export function AgentOverview() {
         </Tabs>
       </main>
     </div>
-  )
+  );
 }
