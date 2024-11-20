@@ -5,11 +5,10 @@ import { useState, useRef, useEffect } from "react";
 import Link from "next/link";
 import { Send } from "lucide-react";
 import ReactMarkdown from "react-markdown";
-import Image from "next/image";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
-import { Avatar, AvatarFallback } from "@/components/ui/avatar";
+import { Avatar, AvatarFallback, AvatarImage } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
 
 interface AgentMetadata {
@@ -186,15 +185,20 @@ export default function AgentChat({ params }: { params?: { id: string } }) {
         <div className="container mx-auto px-4 py-4 max-w-5xl">
           {agentMetadata && (
             <div className="flex items-center gap-4">
-              {agentMetadata.image && (
-                <Image
+              <Avatar className="w-16 h-16">
+                <AvatarImage
                   src={agentMetadata.image}
                   alt={agentMetadata.name || "Agent"}
-                  width={64}
-                  height={64}
-                  className="rounded-full"
                 />
-              )}
+                <AvatarFallback className="bg-purple-100">
+                  <svg viewBox="0 0 24 32" className="w-8 h-8 text-purple-500">
+                    <path
+                      d="M12 0L24 16L12 32L0 16L12 0Z"
+                      className="fill-current"
+                    />
+                  </svg>
+                </AvatarFallback>
+              </Avatar>
               <div>
                 <h1 className="text-2xl font-bold">{agentMetadata.name}</h1>
                 {agentMetadata.description && (
