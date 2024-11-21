@@ -149,8 +149,8 @@ export default function Home() {
 
   return (
     <div className="min-h-screen bg-background flex flex-col">
-      <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl">
-        <Card className="w-full">
+      <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl flex flex-col justify-center">
+        <Card className="w-full max-w-3xl mx-auto">
           <CardContent className="p-6">
             <div className="space-y-6 mb-4 max-h-[60vh] overflow-y-auto">
               {messages.map((message, i) => (
@@ -182,10 +182,12 @@ export default function Home() {
                     )}
                     <div
                       className={`rounded-lg px-4 py-2 ${
-                        message.role === "user" ? "bg-purple-500 " : "bg-muted"
+                        message.role === "user" ? "bg-purple-500 text-white" : "bg-muted"
                       }`}
                     >
-                      <div className="prose prose-sm dark:prose-invert max-w-none">
+                      <div className={`prose prose-sm dark:prose-invert max-w-none ${
+                        message.role === "user" ? "prose-invert text-white" : ""
+                      }`}>
                         <ReactMarkdown
                           components={{
                             p: ({ children }) => (
@@ -259,7 +261,7 @@ export default function Home() {
                 <Button
                   type="submit"
                   size="icon"
-                  className="absolute right-2 top-3 h-8 w-8 bg-purple-600 hover:bg-purple-700 text-white"
+                  className="absolute right-2  text-top-3 h-8 w-8 bg-purple-600 hover:bg-purple-700 text-white"
                   disabled={isLoading}
                 >
                   <Send className="h-4 w-4" />
@@ -269,7 +271,7 @@ export default function Home() {
             </div>
           </CardContent>
         </Card>
-        <div className="flex justify-center space-x-4 mt-8">
+        <div className="flex justify-center space-x-4 mt-8 max-w-3xl mx-auto">
           <Button asChild size="lg">
             <Link
               href="https://docs.autonolas.network/get_started/"
