@@ -142,37 +142,6 @@ export default function AgentChat({ params }: { params?: { id: string } }) {
     handleSubmit(new Event("submit") as unknown as React.FormEvent<Element>);
   };
 
-  // Add this useEffect to fetch agent metadata
-  useEffect(() => {
-    const fetchAgentMetadata = async () => {
-      try {
-        const response = await fetch(
-          `http://localhost:4000/agent?id=${agentId}`
-        );
-        if (!response.ok) throw new Error("Failed to fetch agent metadata");
-        const data = await response.json();
-
-        setAgentMetadata(data);
-      } catch (error) {
-        console.error("Error fetching agent metadata:", error);
-      }
-    };
-
-    fetchAgentMetadata();
-  }, [agentId]);
-
-  // Update the initial message to use the agent name if available
-  useEffect(() => {
-    if (agentMetadata?.name) {
-      setMessages([
-        {
-          role: "assistant",
-          content: `Hi there 👋 - I'm ${agentMetadata?.name}. What would you like to learn about me?`,
-        },
-      ]);
-    }
-  }, [agentMetadata]);
-
   // ... existing useEffect ...
   useEffect(() => {
     messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
