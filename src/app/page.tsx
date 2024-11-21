@@ -60,6 +60,7 @@ export default function Home() {
     setMessages((prev) => [...prev, userMessage]);
     setQuery("");
     setIsLoading(true);
+    const newMessages = [...messages, userMessage];
 
     try {
       const response = await fetch("http://localhost:4000/conversation", {
@@ -69,7 +70,7 @@ export default function Home() {
         },
         body: JSON.stringify({
           question: query,
-          messages: messages.slice(1),
+          messages: newMessages,
         }),
       });
 
@@ -209,6 +210,16 @@ export default function Home() {
                             li: ({ children }) => (
                               <li className="mb-1">{children}</li>
                             ),
+                            a: ({ href, children }) => (
+                              <a
+                                href={href}
+                                target="_blank"
+                                rel="noopener noreferrer"
+                                className="text-blue-500 hover:underline"
+                              >
+                                {children}
+                              </a>
+                            ),
                             code: ({ children }) => (
                               <code className="bg-muted-foreground/20 rounded px-1 py-0.5 text-xs">
                                 {children}
@@ -266,7 +277,11 @@ export default function Home() {
         </Card>
         <div className="flex justify-center space-x-4 mt-8">
           <Button asChild size="lg">
-            <Link href="https://docs.autonolas.network/get_started/">
+            <Link
+              href="https://docs.autonolas.network/get_started/"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
               Launch your agent
             </Link>
           </Button>
@@ -275,7 +290,13 @@ export default function Home() {
             size="lg"
             className="bg-purple-600 text-white hover:bg-purple-700"
           >
-            <Link href="https://docs.olas.network">Documentation</Link>
+            <Link
+              href="https://docs.olas.network"
+              target="_blank"
+              rel="noopener noreferrer"
+            >
+              Documentation
+            </Link>
           </Button>
         </div>
       </main>
