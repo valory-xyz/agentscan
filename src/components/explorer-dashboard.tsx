@@ -1,14 +1,14 @@
-'use client'
+"use client";
 
-import { ArrowUp, Search, Box, Users, History } from "lucide-react"
-import { useState } from "react"
+import { ArrowUp, Search, Users, History } from "lucide-react";
+import { useState } from "react";
 
-import { Button } from "@/components/ui/button"
-import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card"
-import { Input } from "@/components/ui/input"
+import { Button } from "@/components/ui/button";
+import { Card, CardContent, CardHeader, CardTitle } from "@/components/ui/card";
+import { Input } from "@/components/ui/input";
 
 export function ExplorerDashboard() {
-  const [searchQuery, setSearchQuery] = useState("")
+  const [searchQuery, setSearchQuery] = useState("");
 
   return (
     <div className="w-full h-full bg-background">
@@ -45,13 +45,18 @@ export function ExplorerDashboard() {
           <h2 className="text-3xl font-bold leading-tight mb-6">
             <span className="text-purple-600">2,345</span> agents deployed
             <br />
-            by <span className="text-blue-600">1,234</span> services across <span className="text-blue-600">8</span> chains
+            by <span className="text-blue-600">1,234</span> services across{" "}
+            <span className="text-blue-600">8</span> chains
           </h2>
           <div className="flex justify-center space-x-4">
             <Button variant="default" size="lg">
               Deploy Agent
             </Button>
-            <Button variant="outline" size="lg" className="bg-purple-600 text-white hover:bg-purple-700 hover:text-white">
+            <Button
+              variant="outline"
+              size="lg"
+              className="bg-purple-600 text-white hover:bg-purple-700 hover:text-white"
+            >
               Stake $OLAS
             </Button>
           </div>
@@ -61,7 +66,9 @@ export function ExplorerDashboard() {
         <div className="grid grid-cols-1 md:grid-cols-2 gap-6">
           <Card className="mt-8">
             <CardHeader>
-              <CardTitle className="text-lg">Recent Transactions by Agents</CardTitle>
+              <CardTitle className="text-lg">
+                Recent Transactions by Agents
+              </CardTitle>
             </CardHeader>
             <CardContent>
               <div className="space-y-4">
@@ -70,7 +77,9 @@ export function ExplorerDashboard() {
                     <History className="h-5 w-5 mt-1 text-muted-foreground flex-shrink-0" />
                     <div>
                       <p className="text-base font-medium">Agent #306</p>
-                      <p className="text-sm text-muted-foreground">0x1234...5678</p>
+                      <p className="text-sm text-muted-foreground">
+                        0x1234...5678
+                      </p>
                       <p className="text-sm mt-1">Bought $5000 of Japan YES</p>
                     </div>
                   </div>
@@ -79,17 +88,26 @@ export function ExplorerDashboard() {
                   </div>
                 </div>
                 {[1, 2].map((i) => (
-                  <div key={i} className="flex items-start justify-between border-b pb-2">
+                  <div
+                    key={i}
+                    className="flex items-start justify-between border-b pb-2"
+                  >
                     <div className="flex items-start space-x-3">
                       <History className="h-4 w-4 mt-1 text-muted-foreground" />
                       <div>
                         <p className="text-sm font-medium">Agent #{304 + i}</p>
-                        <p className="text-xs text-muted-foreground">0x1234...5678</p>
-                        <p className="text-sm mt-1">Bought $5000 of Japan YES</p>
+                        <p className="text-xs text-muted-foreground">
+                          0x1234...5678
+                        </p>
+                        <p className="text-sm mt-1">
+                          Bought $5000 of Japan YES
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-muted-foreground">{2 + i} mins ago</p>
+                      <p className="text-xs text-muted-foreground">
+                        {2 + i} mins ago
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -103,16 +121,25 @@ export function ExplorerDashboard() {
             <CardContent>
               <div className="space-y-4">
                 {[1, 2, 3].map((i) => (
-                  <div key={i} className="flex items-center justify-between border-b pb-2">
+                  <div
+                    key={i}
+                    className="flex items-center justify-between border-b pb-2"
+                  >
                     <div className="flex items-center space-x-3">
                       <Users className="h-4 w-4 text-muted-foreground" />
                       <div>
-                        <p className="text-sm font-medium">New Agent #{400 + i}</p>
-                        <p className="text-xs text-muted-foreground">Created by 0x9876...4321</p>
+                        <p className="text-sm font-medium">
+                          New Agent #{400 + i}
+                        </p>
+                        <p className="text-xs text-muted-foreground">
+                          Created by 0x9876...4321
+                        </p>
                       </div>
                     </div>
                     <div className="text-right">
-                      <p className="text-xs text-muted-foreground">5 mins ago</p>
+                      <p className="text-xs text-muted-foreground">
+                        5 mins ago
+                      </p>
                     </div>
                   </div>
                 ))}
@@ -122,5 +149,5 @@ export function ExplorerDashboard() {
         </div>
       </main>
     </div>
-  )
+  );
 }
