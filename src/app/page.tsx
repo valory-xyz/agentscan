@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
@@ -100,9 +101,9 @@ export default function Home() {
               return newMessages;
             });
           }
-        } catch (e) {
+        } catch (e: any) {
           // Handle incomplete JSON chunks by ignoring them
-          console.log("Incomplete chunk received");
+          console.log("Incomplete chunk received", e);
         }
       }
     } catch (error) {
