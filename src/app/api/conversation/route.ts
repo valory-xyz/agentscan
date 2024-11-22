@@ -15,10 +15,12 @@ export async function POST(request: Request) {
       }
     );
 
-    // Forward the response directly
+    // Ensure we're returning a properly formatted stream
     return new Response(response.body, {
       headers: {
-        "Content-Type": "application/json",
+        "Content-Type": "text/event-stream",
+        "Cache-Control": "no-cache",
+        Connection: "keep-alive",
       },
     });
   } catch (error) {

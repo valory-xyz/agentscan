@@ -81,24 +81,25 @@ export default function Home() {
 
       const decoder = new TextDecoder();
       let fullContent = "";
+      let buffer = "";
 
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        // Decode the chunk
-        const chunk = decoder.decode(value);
+        buffer += decoder.decode(value, { stream: true });
 
-        // Split the chunk by newlines and process each line
-        const lines = chunk.split("\n");
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
         for (const line of lines) {
           if (line.trim()) {
-            // Only process non-empty lines
             try {
-              const parsed = JSON.parse(line);
+              const jsonStr = line.replace(/^data: /, "").trim();
+              const parsed = JSON.parse(jsonStr);
+
               if (parsed.content) {
                 fullContent += parsed.content;
-                // Update the last message with the accumulated content
                 setMessages((prev) => {
                   const newMessages = [...prev];
                   const lastMessage = newMessages[newMessages.length - 1];
@@ -106,12 +107,29 @@ export default function Home() {
                   return newMessages;
                 });
               }
-            } catch (e: any) {
+            } catch (e) {
               console.log("Failed to parse chunk:", line);
-              // Continue processing other chunks even if one fails
               continue;
             }
           }
+        }
+      }
+
+      if (buffer.trim()) {
+        try {
+          const jsonStr = buffer.replace(/^data: /, "").trim();
+          const parsed = JSON.parse(jsonStr);
+          if (parsed.content) {
+            fullContent += parsed.content;
+            setMessages((prev) => {
+              const newMessages = [...prev];
+              const lastMessage = newMessages[newMessages.length - 1];
+              lastMessage.content = fullContent;
+              return newMessages;
+            });
+          }
+        } catch (e) {
+          console.log("Failed to parse final chunk:", buffer);
         }
       }
     } catch (error) {
