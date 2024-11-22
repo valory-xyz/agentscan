@@ -48,6 +48,7 @@ export default function Home() {
     "How does the trader agent work?",
     "How do I make my own agent?",
     "Can you tell me how to stake OLAS in the easiest way possible?",
+    "Give me content I can look at to learn more about OLAS",
   ];
 
   const [showExternalDialog, setShowExternalDialog] = useState(false);
@@ -408,6 +409,8 @@ export default function Home() {
                           return "🛠️";
                         case "Can you tell me how to stake OLAS in the easiest way possible?":
                           return "💰";
+                        case "Give me content I can look at to learn more about OLAS":
+                          return "📚";
                         default:
                           return "❓";
                       }
