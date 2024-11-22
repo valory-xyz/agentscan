@@ -47,7 +47,7 @@ export default function Home() {
     "Show me a trader agent instance",
     "How does the trader agent work?",
     "How do I make my own agent?",
-    "can you tell me how to stake OLAS in the easiest way possible?",
+    "Can you tell me how to stake OLAS in the easiest way possible?",
   ];
 
   const [showExternalDialog, setShowExternalDialog] = useState(false);
