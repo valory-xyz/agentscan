@@ -5,7 +5,7 @@
 import React from "react";
 import { useState, useRef, useEffect } from "react";
 
-import { Send, Bot, ExternalLink } from "lucide-react";
+import { Send, Bot, ExternalLink, Loader2 } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -370,6 +370,20 @@ export default function Home() {
                     </div>
                   </div>
                 ))}
+                {isLoading && (
+                  <div className="flex mb-4 justify-start">
+                    <div className="flex items-start gap-3 max-w-[80%]">
+                      <Avatar className="h-8 w-8 flex-shrink-0">
+                        <AvatarFallback className="bg-purple-100">
+                          <AnimatedRobot scale={0.2} />
+                        </AvatarFallback>
+                      </Avatar>
+                      <div className="bg-muted rounded-lg px-4 py-2">
+                        <Loader2 className="h-4 w-4 animate-spin" />
+                      </div>
+                    </div>
+                  </div>
+                )}
                 <div ref={messagesEndRef} />
               </div>
 
