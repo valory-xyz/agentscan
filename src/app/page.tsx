@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
 import React from "react";
@@ -6,13 +8,13 @@ import Link from "next/link";
 import { Send, Bot, ExternalLink } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
-import { useRouter } from 'next/navigation';
+import { useRouter } from "next/navigation";
 
 import { Button } from "@/components/ui/button";
 import { Input } from "@/components/ui/input";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import { Card, CardContent } from "@/components/ui/card";
-import AnimatedRobot from '@/components/AnimatedRobot';
+import AnimatedRobot from "@/components/AnimatedRobot";
 import {
   AlertDialog,
   AlertDialogAction,
@@ -30,8 +32,8 @@ const pulseAnimation = {
   transition: {
     duration: 2,
     repeat: Infinity,
-    ease: "easeInOut"
-  }
+    ease: "easeInOut",
+  },
 };
 
 const humanoidAnimation = {
@@ -39,8 +41,8 @@ const humanoidAnimation = {
   y: [20, 0],
   transition: {
     duration: 1,
-    ease: "easeOut"
-  }
+    ease: "easeOut",
+  },
 };
 
 const textAnimation = {
@@ -49,8 +51,8 @@ const textAnimation = {
   transition: {
     delay: 1,
     duration: 0.8,
-    ease: "easeOut"
-  }
+    ease: "easeOut",
+  },
 };
 
 export default function Home() {
@@ -71,13 +73,13 @@ export default function Home() {
     "What activities can OLAS agents do?",
     "How can I launch my own agent?",
     "How many agents exist today?",
-    "How can agents interact with each other?"
+    "How can agents interact with each other?",
   ];
 
   const router = useRouter();
 
   const [showExternalDialog, setShowExternalDialog] = useState(false);
-  const [pendingUrl, setPendingUrl] = useState('');
+  const [pendingUrl, setPendingUrl] = useState("");
 
   const ExternalLinkDialog = () => (
     <AlertDialog open={showExternalDialog} onOpenChange={setShowExternalDialog}>
@@ -85,15 +87,19 @@ export default function Home() {
         <AlertDialogHeader>
           <AlertDialogTitle>Leaving Agentscan</AlertDialogTitle>
           <AlertDialogDescription>
-            You are about to leave Agentscan to visit an external website. Please note that we cannot guarantee the safety or reliability of external sites. Use any external software at your own risk.
+            You are about to leave Agentscan to visit an external website.
+            Please note that we cannot guarantee the safety or reliability of
+            external sites. Use any external software at your own risk.
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
           <AlertDialogCancel>Cancel</AlertDialogCancel>
-          <AlertDialogAction onClick={() => {
-            window.open(pendingUrl, '_blank');
-            setShowExternalDialog(false);
-          }}>
+          <AlertDialogAction
+            onClick={() => {
+              window.open(pendingUrl, "_blank");
+              setShowExternalDialog(false);
+            }}
+          >
             Continue
           </AlertDialogAction>
         </AlertDialogFooter>
@@ -127,16 +133,19 @@ export default function Home() {
     const newMessages = [...messages, userMessage];
 
     try {
-      const response = await fetch("/api/conversation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          question: query,
-          messages: newMessages,
-        }),
-      });
+      const response = await fetch(
+        "https://agentscan-express-production.up.railway.app/conversation",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            question: query,
+            messages: newMessages,
+          }),
+        }
+      );
 
       if (!response.ok) throw new Error("Network response was not ok");
 
@@ -148,46 +157,56 @@ export default function Home() {
       if (!reader) throw new Error("No reader available");
 
       const decoder = new TextDecoder();
+      let fullContent = "";
       let buffer = "";
-      let textContent = "";
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        buffer += decoder.decode(value);
+        buffer += decoder.decode(value, { stream: true });
 
-        const chunks = buffer.split("\n\n");
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
 
-        buffer = chunks.pop() || ""; // Keep the last incomplete chunk
-
-        for (const chunk of chunks) {
-          if (chunk.trim()) {
+        for (const line of lines) {
+          if (line.trim()) {
             try {
-              const data = JSON.parse(chunk);
-              console.log("data", data);
+              const jsonStr = line.replace(/^data: /, "").trim();
+              const parsed = JSON.parse(jsonStr);
 
-              if (data.done) {
-                setIsLoading(false);
-                return;
-              }
-
-              if (data.error) {
-                throw new Error(data.error);
-              }
-
-              if (data.content) {
-                textContent += data.content;
+              if (parsed.content) {
+                fullContent += parsed.content;
                 setMessages((prev) => {
                   const newMessages = [...prev];
                   const lastMessage = newMessages[newMessages.length - 1];
-                  lastMessage.content = textContent;
+                  lastMessage.content = fullContent;
                   return newMessages;
                 });
               }
             } catch (e) {
-              console.error("Error parsing chunk:", e);
+              console.log("Failed to parse chunk:", line);
+              continue;
             }
           }
+        }
+      }
+
+      if (buffer.trim()) {
+        try {
+          const jsonStr = buffer.replace(/^data: /, "").trim();
+          const parsed = JSON.parse(jsonStr);
+          if (parsed.content) {
+            fullContent += parsed.content;
+            setMessages((prev) => {
+              const newMessages = [...prev];
+              const lastMessage = newMessages[newMessages.length - 1];
+              lastMessage.content = fullContent;
+              return newMessages;
+            });
+          }
+        } catch (e) {
+          console.log("Failed to parse final chunk:", buffer);
         }
       }
     } catch (error) {
@@ -233,11 +252,11 @@ export default function Home() {
                   hover:scale-110
                 `}
                 style={{
-                  background: '#A855F7',
-                  transform: 'rotate(45deg)',
-                  aspectRatio: '1',
-                  clipPath: 'polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)',
-                  filter: 'drop-shadow(0 4px 12px rgba(168, 85, 247, 0.15))'
+                  background: "#A855F7",
+                  transform: "rotate(45deg)",
+                  aspectRatio: "1",
+                  clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
+                  filter: "drop-shadow(0 4px 12px rgba(168, 85, 247, 0.15))",
                 }}
               />
             ))}
@@ -251,7 +270,7 @@ export default function Home() {
 
   const BackgroundStars = () => {
     const stars = Array(20).fill(null);
-    
+
     return (
       <div className="absolute inset-0 overflow-hidden">
         {stars.map((_, i) => (
@@ -289,18 +308,22 @@ export default function Home() {
       <motion.main
         className="flex-grow container mx-auto px-4 py-8 max-w-5xl flex flex-col justify-center"
         initial={false}
-        animate={showChat ? {
-          x: '-100%',
-          opacity: 0,
-          display: 'none',
-        } : {
-          x: 0,
-          opacity: 1,
-          display: 'flex',
-        }}
-        transition={{ 
-          duration: 1.2, 
-          ease: [0.4, 0, 0.2, 1]
+        animate={
+          showChat
+            ? {
+                x: "-100%",
+                opacity: 0,
+                display: "none",
+              }
+            : {
+                x: 0,
+                opacity: 1,
+                display: "flex",
+              }
+        }
+        transition={{
+          duration: 1.2,
+          ease: [0.4, 0, 0.2, 1],
         }}
       >
         {/* Landing page content */}
@@ -309,13 +332,14 @@ export default function Home() {
             <Logo />
 
             <div className="max-w-3xl mx-auto text-center">
-              <motion.p 
+              <motion.p
                 className="text-gray-700 text-2xl font-bold italic mb-12 max-w-3xl mx-auto leading-relaxed"
                 style={{
-                  textShadow: '0 0 1px rgba(0,0,0,0.1)'
+                  textShadow: "0 0 1px rgba(0,0,0,0.1)",
                 }}
               >
-                Chat to learn all about Autonolas - how to setup an agent, how the broader ecosystem works, and other fun questions :)
+                Chat to learn all about Autonolas - how to setup an agent, how
+                the broader ecosystem works, and other fun questions :)
               </motion.p>
 
               <motion.div
@@ -347,7 +371,7 @@ export default function Home() {
                 transition={{
                   duration: 2,
                   repeat: Infinity,
-                  ease: "easeInOut"
+                  ease: "easeInOut",
                 }}
               >
                 <Button
@@ -365,19 +389,23 @@ export default function Home() {
 
       <motion.div
         initial={false}
-        animate={showChat ? {
-          x: 0,
-          opacity: 1,
-          display: 'block',
-        } : {
-          x: '100%',
-          opacity: 0,
-          display: 'none',
-        }}
-        transition={{ 
+        animate={
+          showChat
+            ? {
+                x: 0,
+                opacity: 1,
+                display: "block",
+              }
+            : {
+                x: "100%",
+                opacity: 0,
+                display: "none",
+              }
+        }
+        transition={{
           duration: 1.2,
           ease: [0.4, 0, 0.2, 1],
-          delay: 0.3
+          delay: 0.3,
         }}
       >
         {/* Chat interface */}
@@ -411,7 +439,7 @@ export default function Home() {
                               transition={{
                                 duration: 2,
                                 repeat: Infinity,
-                                ease: "easeInOut"
+                                ease: "easeInOut",
                               }}
                             >
                               <path
@@ -424,12 +452,18 @@ export default function Home() {
                       )}
                       <div
                         className={`rounded-lg px-4 py-2 ${
-                          message.role === "user" ? "bg-purple-500 text-white" : "bg-muted"
+                          message.role === "user"
+                            ? "bg-purple-500 text-white"
+                            : "bg-muted"
                         }`}
                       >
-                        <div className={`prose prose-sm dark:prose-invert max-w-none ${
-                          message.role === "user" ? "prose-invert text-white" : ""
-                        }`}>
+                        <div
+                          className={`prose prose-sm dark:prose-invert max-w-none ${
+                            message.role === "user"
+                              ? "prose-invert text-white"
+                              : ""
+                          }`}
+                        >
                           <ReactMarkdown
                             components={{
                               p: ({ children }) => (
@@ -453,12 +487,13 @@ export default function Home() {
                                   href="#"
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    setPendingUrl(href || '');
+                                    setPendingUrl(href || "");
                                     setShowExternalDialog(true);
                                   }}
                                   className="text-blue-500 hover:underline"
                                 >
-                                  {children} <ExternalLink className="inline h-3 w-3" />
+                                  {children}{" "}
+                                  <ExternalLink className="inline h-3 w-3" />
                                 </a>
                               ),
                               code: ({ children }) => (
@@ -530,10 +565,10 @@ export default function Home() {
             </CardContent>
           </Card>
           <div className="flex justify-center space-x-4 mt-8 max-w-3xl mx-auto">
-            <Button 
+            <Button
               size="lg"
               onClick={() => {
-                setPendingUrl('https://docs.autonolas.network/get_started/');
+                setPendingUrl("https://docs.autonolas.network/get_started/");
                 setShowExternalDialog(true);
               }}
             >
@@ -545,7 +580,7 @@ export default function Home() {
               size="lg"
               className="bg-purple-600 text-white hover:bg-purple-700"
               onClick={() => {
-                setPendingUrl('https://docs.olas.network');
+                setPendingUrl("https://docs.olas.network");
                 setShowExternalDialog(true);
               }}
             >
