@@ -1,31 +1,30 @@
 import { motion } from "framer-motion";
 
-export default function AnimatedRobot() {
+interface AnimatedRobotProps {
+  scale?: number;
+}
+
+export default function AnimatedRobot({ scale = 1 }: AnimatedRobotProps) {
   return (
-    <div className="relative h-[400px] w-full flex items-center justify-center">
-      {/* Robot Face */}
+    <div
+      className="relative flex items-center justify-center"
+      style={{ transform: `scale(${scale})` }}
+    >
       <motion.svg
-        width="525"
-        height="525"
-        viewBox="0 0 200 200"
+        width="100"
+        height="100"
+        viewBox="20 20 160 160"
         animate={{
-          y: [-10, 10, -10],
+          y: [-4, 4, -4],
         }}
         transition={{
           duration: 4,
           repeat: Infinity,
-          ease: "easeInOut"
+          ease: "easeInOut",
         }}
       >
         {/* Robot Head */}
-        <rect
-          x="40"
-          y="40"
-          width="120"
-          height="120"
-          rx="20"
-          fill="#9333EA"
-        />
+        <rect x="40" y="40" width="120" height="120" rx="20" fill="#9333EA" />
 
         {/* Eyes */}
         <circle cx="80" cy="90" r="15" fill="white" />
@@ -50,4 +49,4 @@ export default function AnimatedRobot() {
       </motion.svg>
     </div>
   );
-} 
+}

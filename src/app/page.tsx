@@ -4,7 +4,7 @@
 
 import React from "react";
 import { useState, useRef, useEffect } from "react";
-import Link from "next/link";
+
 import { Send, Bot, ExternalLink } from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
@@ -56,7 +56,9 @@ const textAnimation = {
 };
 
 export default function Home() {
-  const [showChat, setShowChat] = useState(false);
+  const messagesContainerRef = useRef<HTMLDivElement>(null);
+  const [userScrolled, setUserScrolled] = useState(false);
+  const [showChat, setShowChat] = useState(true);
   const [query, setQuery] = useState("");
 
   const [messages, setMessages] = useState([
@@ -76,13 +78,11 @@ export default function Home() {
     "How can agents interact with each other?",
   ];
 
-  const router = useRouter();
-
   const [showExternalDialog, setShowExternalDialog] = useState(false);
   const [pendingUrl, setPendingUrl] = useState("");
 
   const ExternalLinkDialog = () => (
-    <AlertDialog open={showExternalDialog} onOpenChange={setShowExternalDialog}>
+    <AlertDialog open={showExternalDialog}>
       <AlertDialogContent>
         <AlertDialogHeader>
           <AlertDialogTitle>Leaving Agentscan</AlertDialogTitle>
@@ -93,7 +93,9 @@ export default function Home() {
           </AlertDialogDescription>
         </AlertDialogHeader>
         <AlertDialogFooter>
-          <AlertDialogCancel>Cancel</AlertDialogCancel>
+          <AlertDialogCancel onClick={() => setShowExternalDialog(false)}>
+            Cancel
+          </AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
               window.open(pendingUrl, "_blank");
@@ -108,24 +110,38 @@ export default function Home() {
   );
 
   useEffect(() => {
-    if (messagesEndRef.current) {
-      const observer = new IntersectionObserver(
-        ([entry]) => {
-          if (!entry.isIntersecting) {
-            messagesEndRef.current?.scrollIntoView({ behavior: "smooth" });
-          }
-        },
-        { threshold: 0.5 }
-      );
-      observer.observe(messagesEndRef.current);
-      return () => observer.disconnect();
-    }
-  }, [messages]);
+    const container = messagesContainerRef.current;
+    if (!container) return;
+
+    const handleScroll = () => {
+      // Check if user has scrolled up
+      const isScrolledUp =
+        container.scrollHeight - container.scrollTop - container.clientHeight >
+        50;
+      setUserScrolled(isScrolledUp);
+    };
+
+    container.addEventListener("scroll", handleScroll);
+    return () => container.removeEventListener("scroll", handleScroll);
+  }, []);
+
+  useEffect(() => {
+    const container = messagesContainerRef.current;
+    if (!container || userScrolled) return;
+
+    // Only auto-scroll if user hasn't scrolled up
+    setTimeout(() => {
+      container.scrollTop = container.scrollHeight;
+    }, 100);
+  }, [messages, userScrolled]);
+
+  const [isStreaming, setIsStreaming] = useState(false);
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim() || isLoading) return;
 
+    setIsStreaming(true);
     const userMessage = { role: "user", content: query };
     setMessages((prev) => [...prev, userMessage]);
     setQuery("");
@@ -185,7 +201,6 @@ export default function Home() {
                 });
               }
             } catch (e) {
-              console.log("Failed to parse chunk:", line);
               continue;
             }
           }
@@ -205,15 +220,14 @@ export default function Home() {
               return newMessages;
             });
           }
-        } catch (e) {
-          console.log("Failed to parse final chunk:", buffer);
-        }
+        } catch (e) {}
       }
     } catch (error) {
       console.error("Error:", error);
       handleError();
     } finally {
       setIsLoading(false);
+      setIsStreaming(false);
     }
   };
 
@@ -236,91 +250,16 @@ export default function Home() {
     handleSubmit(new Event("submit") as unknown as React.FormEvent<Element>);
   };
 
-  const Logo = ({ size = "large" }: { size?: "large" | "small" }) => {
-    const router = useRouter();
-
-    return (
-      <div className="fixed top-0 left-0 right-0 bg-white z-50 pt-8 pb-6 px-4">
-        <div className="text-center cursor-pointer max-w-screen-xl mx-auto">
-          <div className={`flex justify-center items-center gap-14 mb-6`}>
-            {[1, 2, 3].map((_, i) => (
-              <div
-                key={i}
-                className={`
-                  ${size === "large" ? "w-12 h-12" : "w-8 h-8"}
-                  transition-all
-                  hover:scale-110
-                `}
-                style={{
-                  background: "#A855F7",
-                  transform: "rotate(45deg)",
-                  aspectRatio: "1",
-                  clipPath: "polygon(50% 0%, 100% 50%, 50% 100%, 0% 50%)",
-                  filter: "drop-shadow(0 4px 12px rgba(168, 85, 247, 0.15))",
-                }}
-              />
-            ))}
-          </div>
-          <h1 className="text-4xl font-bold mb-2 tracking-tight">agentscan</h1>
-          <p className="text-gray-500 text-xl">An OLAS Explorer</p>
-        </div>
-      </div>
-    );
-  };
-
-  const BackgroundStars = () => {
-    const stars = Array(20).fill(null);
-
-    return (
-      <div className="absolute inset-0 overflow-hidden">
-        {stars.map((_, i) => (
-          <motion.span
-            key={i}
-            className="absolute text-purple-200 text-2xl"
-            initial={{
-              x: Math.random() * window.innerWidth,
-              y: Math.random() * window.innerHeight,
-              scale: Math.random() * 0.5 + 0.5,
-            }}
-            animate={{
-              opacity: [0.3, 1, 0.3],
-              scale: [1, 1.2, 1],
-            }}
-            transition={{
-              duration: 3 + Math.random() * 2,
-              repeat: Infinity,
-              delay: Math.random() * 2,
-            }}
-            style={{
-              left: `${Math.random() * 100}%`,
-              top: `${Math.random() * 100}%`,
-            }}
-          >
-            ⭐
-          </motion.span>
-        ))}
-      </div>
-    );
-  };
-
   return (
-    <div className="min-h-screen bg-white flex flex-col relative overflow-hidden">
+    <div className="bg-white flex flex-col relative overflow-hidden">
       <motion.main
         className="flex-grow container mx-auto px-4 py-8 max-w-5xl flex flex-col justify-center"
         initial={false}
-        animate={
-          showChat
-            ? {
-                x: "-100%",
-                opacity: 0,
-                display: "none",
-              }
-            : {
-                x: 0,
-                opacity: 1,
-                display: "flex",
-              }
-        }
+        animate={{
+          x: "-100%",
+          opacity: 0,
+          display: "none",
+        }}
         transition={{
           duration: 1.2,
           ease: [0.4, 0, 0.2, 1],
@@ -328,80 +267,17 @@ export default function Home() {
       >
         {/* Landing page content */}
         <div className="min-h-screen bg-white flex flex-col relative">
-          <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl flex flex-col justify-center relative">
-            <Logo />
-
-            <div className="max-w-3xl mx-auto text-center">
-              <motion.p
-                className="text-gray-700 text-2xl font-bold italic mb-12 max-w-3xl mx-auto leading-relaxed"
-                style={{
-                  textShadow: "0 0 1px rgba(0,0,0,0.1)",
-                }}
-              >
-                Chat to learn all about Autonolas - how to setup an agent, how
-                the broader ecosystem works, and other fun questions :)
-              </motion.p>
-
-              <motion.div
-                initial={{ opacity: 0 }}
-                animate={{ opacity: 1 }}
-                className="mb-8 flex justify-center"
-              >
-                <AnimatedRobot />
-              </motion.div>
-
-              {/* Welcome Text */}
-              <motion.div
-                initial={{ opacity: 0, y: 20 }}
-                animate={{ opacity: 1, y: 0 }}
-                transition={{ delay: 1, duration: 0.8 }}
-                className="mb-12"
-              >
-                <h2 className="text-4xl font-bold mb-4">
-                  👋 Hi, I'm Andy the OLAS Agent
-                </h2>
-              </motion.div>
-
-              {/* Pulsing Button */}
-              <motion.div
-                animate={{
-                  scale: [1, 1.05, 1],
-                  opacity: [1, 0.8, 1],
-                }}
-                transition={{
-                  duration: 2,
-                  repeat: Infinity,
-                  ease: "easeInOut",
-                }}
-              >
-                <Button
-                  size="lg"
-                  onClick={() => setShowChat(true)}
-                  className="bg-purple-600 hover:bg-purple-700 text-white text-xl px-8 py-6 rounded-xl"
-                >
-                  Chat with Agent
-                </Button>
-              </motion.div>
-            </div>
-          </main>
+          <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl flex flex-col justify-center relative"></main>
         </div>
       </motion.main>
 
       <motion.div
         initial={false}
-        animate={
-          showChat
-            ? {
-                x: 0,
-                opacity: 1,
-                display: "block",
-              }
-            : {
-                x: "100%",
-                opacity: 0,
-                display: "none",
-              }
-        }
+        animate={{
+          x: 0,
+          opacity: 1,
+          display: "block",
+        }}
         transition={{
           duration: 1.2,
           ease: [0.4, 0, 0.2, 1],
@@ -409,48 +285,52 @@ export default function Home() {
         }}
       >
         {/* Chat interface */}
-        <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl flex flex-col justify-center">
-          <Logo />
-
-          <Card className="w-full max-w-3xl mx-auto">
-            <CardContent className="p-6">
-              <div className="space-y-6 mb-4 max-h-[60vh] overflow-y-auto">
+        <main className="flex-grow container mx-auto px-4 py-8 max-w-6xl flex flex-col justify-center">
+          <Card className="w-full max-w-5xl mx-auto h-[65vh] flex flex-col">
+            <CardContent className="p-6 flex flex-col h-full">
+              <div
+                ref={messagesContainerRef}
+                className="flex-1 overflow-y-auto mb-4"
+              >
                 {messages.map((message, i) => (
                   <div
                     key={i}
-                    className={`flex ${
+                    className={`flex mb-4 ${
                       message.role === "user" ? "justify-end" : "justify-start"
                     }`}
                   >
                     <div
-                      className={`flex items-start gap-2 max-w-[80%] ${
-                        message.role === "user" ? "flex-row-reverse" : ""
+                      className={`flex items-start gap-3 max-w-[80%] ${
+                        message.role === "user"
+                          ? "flex-row-reverse"
+                          : "flex-row"
                       }`}
                     >
-                      {message.role === "assistant" && (
-                        <Avatar className="h-8 w-8">
+                      <div
+                        className={`${
+                          message.role === "user" ? "hidden" : "block"
+                        }`}
+                      >
+                        <Avatar className="h-8 w-8 flex-shrink-0">
                           <AvatarFallback className="bg-purple-100">
-                            <motion.svg
-                              viewBox="0 0 24 32"
-                              className="w-5 h-5 text-purple-500"
-                              animate={{
-                                opacity: [1, 0.5, 1],
-                              }}
-                              transition={{
-                                duration: 2,
-                                repeat: Infinity,
-                                ease: "easeInOut",
-                              }}
-                            >
-                              <path
-                                d="M12 0L24 16L12 32L0 16L12 0Z"
-                                className="fill-current"
-                              />
-                            </motion.svg>
+                            <AnimatedRobot scale={0.2} />
                           </AvatarFallback>
                         </Avatar>
-                      )}
-                      <div
+                      </div>
+                      <motion.div
+                        initial="initial"
+                        animate="animate"
+                        variants={{
+                          initial: {
+                            opacity: 0,
+                            x: message.role === "user" ? 20 : -20,
+                          },
+                          animate: { opacity: 1, x: 0 },
+                        }}
+                        transition={{
+                          duration: 0.8,
+                          ease: "easeOut",
+                        }}
                         className={`rounded-lg px-4 py-2 ${
                           message.role === "user"
                             ? "bg-purple-500 text-white"
@@ -487,8 +367,10 @@ export default function Home() {
                                   href="#"
                                   onClick={(e) => {
                                     e.preventDefault();
-                                    setPendingUrl(href || "");
-                                    setShowExternalDialog(true);
+                                    if (!isStreaming) {
+                                      setPendingUrl(href || "");
+                                      setShowExternalDialog(true);
+                                    }
                                   }}
                                   className="text-blue-500 hover:underline"
                                 >
@@ -511,14 +393,14 @@ export default function Home() {
                             {message.content}
                           </ReactMarkdown>
                         </div>
-                      </div>
+                      </motion.div>
                     </div>
                   </div>
                 ))}
                 <div ref={messagesEndRef} />
               </div>
 
-              <div className="mt-4">
+              <div className="mt-auto">
                 <form onSubmit={handleSubmit} className="relative mb-4">
                   <Input
                     value={query}
