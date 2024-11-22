@@ -15,6 +15,8 @@ export async function POST(request: Request) {
       }
     );
 
+    console.log(response.body);
+
     // Return the response as a stream
     return new NextResponse(response.body);
     // eslint-disable-next-line @typescript-eslint/no-explicit-any
