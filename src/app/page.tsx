@@ -44,7 +44,7 @@ export default function Home() {
   const exampleQuestions = [
     "What is an OLAS Agent?",
     "Give me an example of an OLAS Agent",
-    "Show me a trader agent instance",
+    "Show me a agent that predicts prediction market",
     "How does the trader agent work?",
     "How do I make my own agent?",
     "Can you tell me how to stake OLAS in the easiest way possible?",
