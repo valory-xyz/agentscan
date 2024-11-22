@@ -44,7 +44,7 @@ export default function Home() {
   const exampleQuestions = [
     "What is an OLAS Agent?",
     "Give me an example of an OLAS Agent",
-    "Show me a agent that predicts prediction market",
+    "Show me a agent that predicts prediction markets",
     "How does the trader agent work?",
     "How do I make my own agent?",
     "Can you tell me how to stake OLAS in the easiest way possible?",
@@ -400,7 +400,7 @@ export default function Home() {
                           return "🤖";
                         case "Give me an example of an OLAS Agent":
                           return "💡";
-                        case "Show me a agent that predicts prediction market":
+                        case "Show me a agent that predicts prediction markets":
                           return "🎯";
                         case "How does the trader agent work?":
                           return "📈";
