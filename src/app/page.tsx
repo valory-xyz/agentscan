@@ -395,11 +395,12 @@ export default function Home() {
                 <div className="flex flex-wrap gap-2 justify-center">
                   {exampleQuestions.map((question, index) => {
                     const getEmoji = (q: string) => {
-                      if (q.includes("What is")) return "🤔";
-                      if (q.includes("activities")) return "🎯";
-                      if (q.includes("launch")) return "🚀";
-                      if (q.includes("how many")) return "📊";
-                      if (q.includes("interact")) return "🤝";
+                      if (q.includes("What is")) return "🤖";
+                      if (q.includes("example")) return "💡";
+                      if (q.includes("trader")) return "📈";
+                      if (q.includes("How does")) return "⚙️";
+                      if (q.includes("make my own")) return "🛠️";
+                      if (q.includes("things")) return "✨";
                       return "❓";
                     };
 
