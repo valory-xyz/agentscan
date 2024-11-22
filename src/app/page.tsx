@@ -78,46 +78,31 @@ export default function Home() {
       if (!reader) throw new Error("No reader available");
 
       const decoder = new TextDecoder();
-      let buffer = "";
-      let textContent = "";
+      let fullContent = "";
+
       while (true) {
         const { done, value } = await reader.read();
         if (done) break;
 
-        buffer += decoder.decode(value);
+        // Decode the chunk
+        const chunk = decoder.decode(value);
 
-        const chunks = buffer.split("\n\n");
-
-        buffer = chunks.pop() || ""; // Keep the last incomplete chunk
-
-        for (const chunk of chunks) {
-          if (chunk.trim()) {
-            try {
-              const data = JSON.parse(chunk);
-              console.log("data", data);
-
-              if (data.done) {
-                setIsLoading(false);
-                return;
-              }
-
-              if (data.error) {
-                throw new Error(data.error);
-              }
-
-              if (data.content) {
-                textContent += data.content;
-                setMessages((prev) => {
-                  const newMessages = [...prev];
-                  const lastMessage = newMessages[newMessages.length - 1];
-                  lastMessage.content = textContent;
-                  return newMessages;
-                });
-              }
-            } catch (e) {
-              console.error("Error parsing chunk:", e);
-            }
+        // Parse the JSON response
+        try {
+          const parsed = JSON.parse(chunk);
+          if (parsed.content) {
+            fullContent += parsed.content;
+            // Update the last message with the accumulated content
+            setMessages((prev) => {
+              const newMessages = [...prev];
+              const lastMessage = newMessages[newMessages.length - 1];
+              lastMessage.content = fullContent;
+              return newMessages;
+            });
           }
+        } catch (e) {
+          // Handle incomplete JSON chunks by ignoring them
+          console.log("Incomplete chunk received");
         }
       }
     } catch (error) {
@@ -182,12 +167,18 @@ export default function Home() {
                     )}
                     <div
                       className={`rounded-lg px-4 py-2 ${
-                        message.role === "user" ? "bg-purple-500 text-white" : "bg-muted"
+                        message.role === "user"
+                          ? "bg-purple-500 text-white"
+                          : "bg-muted"
                       }`}
                     >
-                      <div className={`prose prose-sm dark:prose-invert max-w-none ${
-                        message.role === "user" ? "prose-invert text-white" : ""
-                      }`}>
+                      <div
+                        className={`prose prose-sm dark:prose-invert max-w-none ${
+                          message.role === "user"
+                            ? "prose-invert text-white"
+                            : ""
+                        }`}
+                      >
                         <ReactMarkdown
                           components={{
                             p: ({ children }) => (

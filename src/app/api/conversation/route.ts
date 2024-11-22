@@ -15,12 +15,13 @@ export async function POST(request: Request) {
       }
     );
 
-    console.log(response.body);
-
-    // Return the response as a stream
-    return new NextResponse(response.body);
-    // eslint-disable-next-line @typescript-eslint/no-explicit-any
-  } catch (error: any) {
+    // Forward the response directly
+    return new Response(response.body, {
+      headers: {
+        "Content-Type": "application/json",
+      },
+    });
+  } catch (error) {
     console.error(error);
     return NextResponse.json(
       { error: "Internal Server Error" },
