@@ -26,39 +26,10 @@ import {
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
 
-const pulseAnimation = {
-  scale: [1, 1.05, 1],
-  opacity: [1, 0.8, 1],
-  transition: {
-    duration: 2,
-    repeat: Infinity,
-    ease: "easeInOut",
-  },
-};
-
-const humanoidAnimation = {
-  opacity: [0, 1],
-  y: [20, 0],
-  transition: {
-    duration: 1,
-    ease: "easeOut",
-  },
-};
-
-const textAnimation = {
-  opacity: [0, 1],
-  x: [-20, 0],
-  transition: {
-    delay: 1,
-    duration: 0.8,
-    ease: "easeOut",
-  },
-};
-
 export default function Home() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
-  const [showChat, setShowChat] = useState(true);
+
   const [query, setQuery] = useState("");
 
   const [messages, setMessages] = useState([
@@ -72,10 +43,11 @@ export default function Home() {
 
   const exampleQuestions = [
     "What is an OLAS Agent?",
-    "What activities can OLAS agents do?",
-    "How can I launch my own agent?",
-    "How many agents exist today?",
-    "How can agents interact with each other?",
+    "Give me an example of an OLAS Agent",
+    "Show me a trader agent instance",
+    "How does the trader agent work?",
+    "How do I make my own agent?",
+    "What are some things an agent can do?",
   ];
 
   const [showExternalDialog, setShowExternalDialog] = useState(false);
