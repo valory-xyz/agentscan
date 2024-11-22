@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-unused-vars */
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
@@ -88,22 +89,29 @@ export default function Home() {
         // Decode the chunk
         const chunk = decoder.decode(value);
 
-        // Parse the JSON response
-        try {
-          const parsed = JSON.parse(chunk);
-          if (parsed.content) {
-            fullContent += parsed.content;
-            // Update the last message with the accumulated content
-            setMessages((prev) => {
-              const newMessages = [...prev];
-              const lastMessage = newMessages[newMessages.length - 1];
-              lastMessage.content = fullContent;
-              return newMessages;
-            });
+        // Split the chunk by newlines and process each line
+        const lines = chunk.split("\n");
+        for (const line of lines) {
+          if (line.trim()) {
+            // Only process non-empty lines
+            try {
+              const parsed = JSON.parse(line);
+              if (parsed.content) {
+                fullContent += parsed.content;
+                // Update the last message with the accumulated content
+                setMessages((prev) => {
+                  const newMessages = [...prev];
+                  const lastMessage = newMessages[newMessages.length - 1];
+                  lastMessage.content = fullContent;
+                  return newMessages;
+                });
+              }
+            } catch (e: any) {
+              console.log("Failed to parse chunk:", line);
+              // Continue processing other chunks even if one fails
+              continue;
+            }
           }
-        } catch (e: any) {
-          // Handle incomplete JSON chunks by ignoring them
-          console.log("Incomplete chunk received", e);
         }
       }
     } catch (error) {
