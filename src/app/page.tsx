@@ -51,6 +51,13 @@ export default function Home() {
     "Give me content I can look at to learn more about OLAS",
   ];
 
+  const mobileExampleQuestions = [
+    "What is an OLAS Agent?",
+    "Give me an example of an OLAS Agent",
+    "How to stake OLAS?",
+    "How do I make my own agent?",
+  ];
+
   const [showExternalDialog, setShowExternalDialog] = useState(false);
   const [pendingUrl, setPendingUrl] = useState("");
 
@@ -223,6 +230,27 @@ export default function Home() {
     handleSubmit(new Event("submit") as unknown as React.FormEvent<Element>);
   };
 
+  const getEmoji = (q: string) => {
+    switch (q) {
+      case "What is an OLAS Agent?":
+        return "🤖";
+      case "Give me an example of an OLAS Agent":
+        return "💡";
+      case "Show me a agent that predicts prediction markets":
+        return "🎯";
+      case "How does the trader agent work?":
+        return "📈";
+      case "How do I make my own agent?":
+        return "🛠️";
+      case "Can you tell me how to stake OLAS in the easiest way possible?":
+        return "💰";
+      case "Give me content I can look at to learn more about OLAS":
+        return "📚";
+      default:
+        return "❓";
+    }
+  };
+
   return (
     <div className="bg-white flex flex-col relative overflow-hidden">
       <motion.main
@@ -258,9 +286,9 @@ export default function Home() {
         }}
       >
         {/* Chat interface */}
-        <main className="flex-grow container mx-auto px-4 py-8 max-w-6xl flex flex-col justify-center">
-          <Card className="w-full max-w-5xl mx-auto h-[65vh] flex flex-col">
-            <CardContent className="p-6 flex flex-col h-full">
+        <main className="flex-grow w-full container mx-auto px-2 md:px-4 py-2 max-w-6xl flex flex-col justify-center">
+          <Card className="w-full max-w-full mx-auto h-[85vh] md:h-[70vh] flex flex-col">
+            <CardContent className="p-2 md:p-4 flex flex-col h-full">
               <div
                 ref={messagesContainerRef}
                 className="flex-1 overflow-y-auto mb-4"
@@ -388,18 +416,18 @@ export default function Home() {
               </div>
 
               <div className="mt-auto">
-                <form onSubmit={handleSubmit} className="relative mb-4">
+                <form onSubmit={handleSubmit} className="relative mb-2 md:mb-4">
                   <Input
                     value={query}
                     onChange={(e) => setQuery(e.target.value)}
                     placeholder="Ask Andy Anything..."
-                    className="w-full h-14 pl-5 pr-14"
+                    className="w-full h-12 md:h-14 pl-3 md:pl-5 pr-12 md:pr-14 text-sm md:text-base"
                     disabled={isLoading}
                   />
                   <Button
                     type="submit"
                     size="icon"
-                    className="absolute right-2 top-3 h-8 w-8 bg-purple-600 hover:bg-purple-700 text-white"
+                    className="absolute right-2 top-2 md:top-3 h-8 w-8 bg-purple-600 hover:bg-purple-700 text-white"
                     disabled={isLoading}
                   >
                     <Send className="h-4 w-4" />
@@ -407,47 +435,44 @@ export default function Home() {
                   </Button>
                 </form>
 
-                <div className="flex flex-wrap gap-2 justify-center">
-                  {exampleQuestions.map((question, index) => {
-                    const getEmoji = (q: string) => {
-                      switch (q) {
-                        case "What is an OLAS Agent?":
-                          return "🤖";
-                        case "Give me an example of an OLAS Agent":
-                          return "💡";
-                        case "Show me a agent that predicts prediction markets":
-                          return "🎯";
-                        case "How does the trader agent work?":
-                          return "📈";
-                        case "How do I make my own agent?":
-                          return "🛠️";
-                        case "Can you tell me how to stake OLAS in the easiest way possible?":
-                          return "💰";
-                        case "Give me content I can look at to learn more about OLAS":
-                          return "📚";
-                        default:
-                          return "❓";
-                      }
-                    };
+                <div className="flex flex-wrap gap-1 md:gap-2 justify-center">
+                  <div className="hidden md:flex md:flex-wrap md:gap-2 md:justify-center">
+                    {exampleQuestions.map((question, index) => {
+                      return (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          onClick={() => handleQuestionClick(question)}
+                          className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
+                        >
+                          {getEmoji(question)} {question}
+                        </Button>
+                      );
+                    })}
+                  </div>
 
-                    return (
+                  <div className="flex flex-wrap gap-1 justify-center md:hidden">
+                    {mobileExampleQuestions.map((question, index) => (
                       <Button
                         key={index}
                         variant="outline"
-                        onClick={() => handleQuestionClick(question)}
-                        className="text-gray-600 hover:text-gray-800"
+                        onClick={() =>
+                          handleQuestionClick(exampleQuestions[index])
+                        }
+                        className="text-gray-600 hover:text-gray-800 text-xs py-1 px-2"
                       >
                         {getEmoji(question)} {question}
                       </Button>
-                    );
-                  })}
+                    ))}
+                  </div>
                 </div>
               </div>
             </CardContent>
           </Card>
-          <div className="flex justify-center space-x-4 mt-8 max-w-3xl mx-auto">
+
+          <div className="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-4 mt-4 md:mt-8 max-w-3xl mx-auto px-2">
             <Button
-              size="lg"
+              className="w-full md:w-auto"
               onClick={() => {
                 setPendingUrl("https://docs.autonolas.network/get_started/");
                 setShowExternalDialog(true);
@@ -458,8 +483,7 @@ export default function Home() {
             </Button>
             <Button
               variant="outline"
-              size="lg"
-              className="bg-purple-600 text-white hover:bg-purple-700"
+              className="w-full md:w-auto bg-purple-600 text-white hover:bg-purple-700"
               onClick={() => {
                 setPendingUrl("https://docs.olas.network");
                 setShowExternalDialog(true);
