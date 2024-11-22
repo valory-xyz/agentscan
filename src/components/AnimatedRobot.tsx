@@ -15,7 +15,7 @@ export default function AnimatedRobot({ scale = 1 }: AnimatedRobotProps) {
         height="100"
         viewBox="20 20 160 160"
         animate={{
-          y: [-4, 4, -4],
+          y: [-11, 11, -11],
         }}
         transition={{
           duration: 4,
