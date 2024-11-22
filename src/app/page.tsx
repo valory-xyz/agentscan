@@ -395,13 +395,22 @@ export default function Home() {
                 <div className="flex flex-wrap gap-2 justify-center">
                   {exampleQuestions.map((question, index) => {
                     const getEmoji = (q: string) => {
-                      if (q.includes("What is")) return "🤖";
-                      if (q.includes("example")) return "💡";
-                      if (q.includes("trader")) return "📈";
-                      if (q.includes("How does")) return "⚙️";
-                      if (q.includes("make my own")) return "🛠️";
-                      if (q.includes("things")) return "✨";
-                      return "❓";
+                      switch (q) {
+                        case "What is an OLAS Agent?":
+                          return "🤖";
+                        case "Give me an example of an OLAS Agent":
+                          return "💡";
+                        case "Show me a agent that predicts prediction market":
+                          return "🎯";
+                        case "How does the trader agent work?":
+                          return "📈";
+                        case "How do I make my own agent?":
+                          return "🛠️";
+                        case "Can you tell me how to stake OLAS in the easiest way possible?":
+                          return "💰";
+                        default:
+                          return "❓";
+                      }
                     };
 
                     return (
