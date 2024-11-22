@@ -59,16 +59,19 @@ export default function Home() {
     const newMessages = [...messages, userMessage];
 
     try {
-      const response = await fetch("/api/conversation", {
-        method: "POST",
-        headers: {
-          "Content-Type": "application/json",
-        },
-        body: JSON.stringify({
-          question: query,
-          messages: newMessages,
-        }),
-      });
+      const response = await fetch(
+        "https://agentscan-express-production.up.railway.app/conversation",
+        {
+          method: "POST",
+          headers: {
+            "Content-Type": "application/json",
+          },
+          body: JSON.stringify({
+            question: query,
+            messages: newMessages,
+          }),
+        }
+      );
 
       if (!response.ok) throw new Error("Network response was not ok");
 
