@@ -30,16 +30,6 @@ export default function RootLayout({
       <body
         className={`${geistSans.variable} ${geistMono.variable} antialiased`}
       >
-        {/* Top Navigation */}
-        <header className="w-full border-b">
-          <div className="container mx-auto px-4 py-3">
-            <div className="flex items-center text-green-600">
-              <span className="font-medium">$OLAS: $1.24</span>
-              <ArrowUp className="h-4 w-4 ml-1" />
-              <span className="text-sm ml-1">2.5%</span>
-            </div>
-          </div>
-        </header>
         {children}
         <footer className="w-full py-4 bg-muted/50 mt-auto">
           <div className="container mx-auto px-4 text-center">
