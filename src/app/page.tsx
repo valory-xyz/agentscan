@@ -25,6 +25,8 @@ import {
   AlertDialogHeader,
   AlertDialogTitle,
 } from "@/components/ui/alert-dialog";
+import { useToast } from "@/hooks/use-toast";
+import { Toaster } from "@/components/ui/toaster";
 
 export default function Home() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -117,6 +119,8 @@ export default function Home() {
 
   const [isStreaming, setIsStreaming] = useState(false);
 
+  const { toast } = useToast();
+
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
     if (!query.trim() || isLoading) return;
@@ -142,6 +146,16 @@ export default function Home() {
           }),
         }
       );
+
+      if (response.status === 429) {
+        const data = await response.json();
+        toast({
+          variant: "destructive",
+          title: data.message || "Please try again later",
+        });
+        setMessages((prev) => prev.slice(0, -1));
+        return;
+      }
 
       if (!response.ok) throw new Error("Network response was not ok");
 
@@ -202,8 +216,8 @@ export default function Home() {
           }
         } catch (e) {}
       }
-    } catch (error) {
-      console.error("Error:", error);
+    } catch (error: any) {
+      console.log("Error:", error);
       handleError();
     } finally {
       setIsLoading(false);
@@ -496,6 +510,7 @@ export default function Home() {
         </main>
       </motion.div>
       <ExternalLinkDialog />
+      <Toaster />
     </div>
   );
 }
