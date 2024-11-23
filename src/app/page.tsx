@@ -27,6 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
+import { getUserId } from "../lib/amplitude";
 
 export default function Home() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -143,6 +144,7 @@ export default function Home() {
           body: JSON.stringify({
             question: query,
             messages: newMessages,
+            userId: getUserId(),
           }),
         }
       );

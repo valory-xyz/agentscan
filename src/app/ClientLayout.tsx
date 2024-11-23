@@ -1,8 +1,9 @@
 "use client";
 
-import React from "react";
+import React, { useEffect } from "react";
 import AnimatedRobot from "@/components/AnimatedRobot";
 import Link from "next/link";
+import { initAmplitude } from "@/lib/amplitude";
 
 interface ClientLayoutProps {
   children: React.ReactNode;
@@ -15,6 +16,10 @@ export default function ClientLayout({
   geistSansVariable,
   geistMonoVariable,
 }: ClientLayoutProps) {
+  useEffect(() => {
+    initAmplitude();
+  }, []);
+
   return (
     <body
       className={`${geistSansVariable} ${geistMonoVariable} min-h-screen flex flex-col`}
