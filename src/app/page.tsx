@@ -213,7 +213,12 @@ export default function Home() {
       }
     } catch (error: any) {
       console.log("Error:", error);
-      handleError();
+      toast({
+        variant: "destructive",
+        title: "An error occurred",
+        description: "Please try again later",
+      });
+      setMessages((prev) => prev.slice(0, -1));
     } finally {
       setIsLoading(false);
       setIsStreaming(false);
