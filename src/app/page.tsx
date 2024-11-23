@@ -145,6 +145,7 @@ export default function Home() {
             question: query,
             messages: newMessages,
             userId: getUserId(),
+            teamId: "olas",
           }),
         }
       );
