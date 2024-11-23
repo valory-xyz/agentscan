@@ -122,30 +122,23 @@ export default function Home() {
 
   const { toast } = useToast();
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim() || isLoading) return;
-
-    setIsStreaming(true);
-    const userMessage = { role: "user", content: query };
-    setMessages((prev) => [...prev, userMessage]);
-    setQuery("");
+  const sendMessage = async (question: string, currentMessages: any[]) => {
     setIsLoading(true);
-    const newMessages = [...messages, userMessage];
+    setIsStreaming(true);
 
     try {
       const response = await fetch(
-        "https://agentscan-express-production.up.railway.app/conversation",
+        `${process.env.NEXT_PUBLIC_API_URL}/conversation`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
           },
           body: JSON.stringify({
-            question: query,
-            messages: newMessages,
+            question,
+            messages: currentMessages,
             userId: getUserId(),
-            teamId: "olas",
+            teamId: process.env.NEXT_PUBLIC_TEAM_ID,
           }),
         }
       );
@@ -178,7 +171,6 @@ export default function Home() {
         if (done) break;
 
         buffer += decoder.decode(value, { stream: true });
-
         const lines = buffer.split("\n");
         buffer = lines.pop() || "";
 
@@ -228,118 +220,23 @@ export default function Home() {
     }
   };
 
-  // Helper function to handle errors
-  const handleError = () => {
-    setMessages((prev) => {
-      const newMessages = [...prev];
-      const lastMessage = newMessages[newMessages.length - 1];
-      if (lastMessage.role === "assistant" && !lastMessage.content) {
-        lastMessage.content =
-          "Sorry, there was an error processing your request. Please try again.";
-      }
-      return newMessages;
-    });
-    setIsLoading(false);
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!query.trim() || isLoading) return;
+
+    const userMessage = { role: "user", content: query };
+    setMessages((prev) => [...prev, userMessage]);
+    setQuery("");
+    const newMessages = [...messages, userMessage];
+    await sendMessage(query, newMessages);
   };
 
-  const handleQuestionClick = (question: string) => {
-    setQuery(question);
+  const handleQuestionClick = async (question: string) => {
     const userMessage = { role: "user", content: question };
     setMessages((prev) => [...prev, userMessage]);
     setQuery("");
-    setIsLoading(true);
     const newMessages = [...messages, userMessage];
-
-    fetch("https://agentscan-express-production.up.railway.app/conversation", {
-      method: "POST",
-      headers: {
-        "Content-Type": "application/json",
-      },
-      body: JSON.stringify({
-        question: question,
-        messages: newMessages,
-        userId: getUserId(),
-      }),
-    })
-    .then(async (response) => {
-      if (response.status === 429) {
-        const data = await response.json();
-        toast({
-          variant: "destructive",
-          title: data.message || "Please try again later",
-        });
-        setMessages((prev) => prev.slice(0, -1));
-        return;
-      }
-
-      if (!response.ok) throw new Error("Network response was not ok");
-
-      // Add initial assistant message
-      const assistantMessage = { role: "assistant", content: "" };
-      setMessages((prev) => [...prev, assistantMessage]);
-
-      const reader = response.body?.getReader();
-      if (!reader) throw new Error("No reader available");
-
-      const decoder = new TextDecoder();
-      let fullContent = "";
-      let buffer = "";
-
-      while (true) {
-        const { done, value } = await reader.read();
-        if (done) break;
-
-        buffer += decoder.decode(value, { stream: true });
-
-        const lines = buffer.split("\n");
-        buffer = lines.pop() || "";
-
-        for (const line of lines) {
-          if (line.trim()) {
-            try {
-              const jsonStr = line.replace(/^data: /, "").trim();
-              const parsed = JSON.parse(jsonStr);
-
-              if (parsed.content) {
-                fullContent += parsed.content;
-                setMessages((prev) => {
-                  const newMessages = [...prev];
-                  const lastMessage = newMessages[newMessages.length - 1];
-                  lastMessage.content = fullContent;
-                  return newMessages;
-                });
-              }
-            } catch (e) {
-              continue;
-            }
-          }
-        }
-      }
-
-      if (buffer.trim()) {
-        try {
-          const jsonStr = buffer.replace(/^data: /, "").trim();
-          const parsed = JSON.parse(jsonStr);
-          if (parsed.content) {
-            fullContent += parsed.content;
-            setMessages((prev) => {
-              const newMessages = [...prev];
-              const lastMessage = newMessages[newMessages.length - 1];
-              lastMessage.content = fullContent;
-              return newMessages;
-            });
-          }
-        } catch (e) {}
-      }
-    })
-    .catch((error: any) => {
-      console.log("Error:", error);
-      handleError();
-    })
-    .finally(() => {
-      setIsLoading(false);
-      setIsStreaming(false);
-    });
+    await sendMessage(question, newMessages);
   };
 
   const getEmoji = (q: string) => {
