@@ -243,7 +243,102 @@ export default function Home() {
 
   const handleQuestionClick = (question: string) => {
     setQuery(question);
-    handleSubmit(new Event("submit") as unknown as React.FormEvent<Element>);
+    const userMessage = { role: "user", content: question };
+    setMessages((prev) => [...prev, userMessage]);
+    setQuery("");
+    setIsLoading(true);
+    const newMessages = [...messages, userMessage];
+
+    fetch("https://agentscan-express-production.up.railway.app/conversation", {
+      method: "POST",
+      headers: {
+        "Content-Type": "application/json",
+      },
+      body: JSON.stringify({
+        question: question,
+        messages: newMessages,
+        userId: getUserId(),
+      }),
+    })
+    .then(async (response) => {
+      if (response.status === 429) {
+        const data = await response.json();
+        toast({
+          variant: "destructive",
+          title: data.message || "Please try again later",
+        });
+        setMessages((prev) => prev.slice(0, -1));
+        return;
+      }
+
+      if (!response.ok) throw new Error("Network response was not ok");
+
+      // Add initial assistant message
+      const assistantMessage = { role: "assistant", content: "" };
+      setMessages((prev) => [...prev, assistantMessage]);
+
+      const reader = response.body?.getReader();
+      if (!reader) throw new Error("No reader available");
+
+      const decoder = new TextDecoder();
+      let fullContent = "";
+      let buffer = "";
+
+      while (true) {
+        const { done, value } = await reader.read();
+        if (done) break;
+
+        buffer += decoder.decode(value, { stream: true });
+
+        const lines = buffer.split("\n");
+        buffer = lines.pop() || "";
+
+        for (const line of lines) {
+          if (line.trim()) {
+            try {
+              const jsonStr = line.replace(/^data: /, "").trim();
+              const parsed = JSON.parse(jsonStr);
+
+              if (parsed.content) {
+                fullContent += parsed.content;
+                setMessages((prev) => {
+                  const newMessages = [...prev];
+                  const lastMessage = newMessages[newMessages.length - 1];
+                  lastMessage.content = fullContent;
+                  return newMessages;
+                });
+              }
+            } catch (e) {
+              continue;
+            }
+          }
+        }
+      }
+
+      if (buffer.trim()) {
+        try {
+          const jsonStr = buffer.replace(/^data: /, "").trim();
+          const parsed = JSON.parse(jsonStr);
+          if (parsed.content) {
+            fullContent += parsed.content;
+            setMessages((prev) => {
+              const newMessages = [...prev];
+              const lastMessage = newMessages[newMessages.length - 1];
+              lastMessage.content = fullContent;
+              return newMessages;
+            });
+          }
+        } catch (e) {}
+      }
+    })
+    .catch((error: any) => {
+      console.log("Error:", error);
+      handleError();
+    })
+    .finally(() => {
+      setIsLoading(false);
+      setIsStreaming(false);
+    });
   };
 
   const getEmoji = (q: string) => {
