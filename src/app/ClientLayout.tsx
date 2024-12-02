@@ -55,7 +55,7 @@ export default function ClientLayout({
           className="absolute right-14 bottom-4"
           onClick={() => {
             logEvent("external_link_clicked", {
-              url: "https://olas.network/",
+              url: "https://olas.network",
               context: "footer_link",
               teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
             });

@@ -64,6 +64,8 @@ export default function Home() {
   const [showExternalDialog, setShowExternalDialog] = useState(false);
   const [pendingUrl, setPendingUrl] = useState("");
 
+  const cleanUrl = (url: string) => url.replace(/\/+$/, "");
+
   const ExternalLinkDialog = () => (
     <AlertDialog open={showExternalDialog}>
       <AlertDialogContent>
@@ -81,7 +83,11 @@ export default function Home() {
           </AlertDialogCancel>
           <AlertDialogAction
             onClick={() => {
-              window.open(pendingUrl, "_blank");
+              logEvent("external_link_clicked", {
+                url: cleanUrl(pendingUrl),
+                teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+              });
+              window.open(cleanUrl(pendingUrl), "_blank");
               setShowExternalDialog(false);
             }}
           >
@@ -401,15 +407,6 @@ export default function Home() {
                                       if (!isStreaming) {
                                         setPendingUrl(href || "");
                                         setShowExternalDialog(true);
-                                        logEvent("external_link_clicked", {
-                                          url: href || "",
-                                          context: "chat_message",
-                                          lastQuestion,
-                                          lastResponse,
-                                          teamId:
-                                            process.env.NEXT_PUBLIC_TEAM_ID ||
-                                            "",
-                                        });
                                       }
                                     }}
                                     className="text-blue-500 hover:underline"
@@ -514,13 +511,8 @@ export default function Home() {
             <Button
               className="w-full md:w-auto"
               onClick={() => {
-                setPendingUrl("https://docs.autonolas.network/get_started/");
+                setPendingUrl("https://docs.autonolas.network/get_started");
                 setShowExternalDialog(true);
-                logEvent("external_link_clicked", {
-                  url: "https://docs.autonolas.network/get_started/",
-                  context: "launch_agent_button",
-                  teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-                });
               }}
             >
               Launch your agent
@@ -532,11 +524,6 @@ export default function Home() {
               onClick={() => {
                 setPendingUrl("https://docs.olas.network");
                 setShowExternalDialog(true);
-                logEvent("external_link_clicked", {
-                  url: "https://docs.olas.network",
-                  context: "documentation_button",
-                  teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-                });
               }}
             >
               Documentation
