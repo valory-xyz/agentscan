@@ -11,14 +11,7 @@ export const initAmplitude = () => {
     localStorage.setItem(USER_ID_KEY, userId);
   }
 
-  amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string, {
-    defaultTracking: {
-      sessions: true,
-      pageViews: true,
-      formInteractions: true,
-      fileDownloads: true,
-    },
-  });
+  amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string);
 
   // Set the user ID in Amplitude
   amplitude.setUserId(userId);

@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { getUserId } from "../lib/amplitude";
+import { getUserId, logEvent } from "../lib/amplitude";
 
 export default function Home() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -265,6 +265,19 @@ export default function Home() {
     }
   };
 
+  const getLastConversationContext = () => {
+    const lastUserMessage = [...messages]
+      .reverse()
+      .find((m) => m.role === "user");
+    const lastAssistantMessage = [...messages]
+      .reverse()
+      .find((m) => m.role === "assistant");
+    return {
+      lastQuestion: lastUserMessage?.content || "",
+      lastResponse: lastAssistantMessage?.content || "",
+    };
+  };
+
   return (
     <div className="bg-white flex flex-col relative overflow-hidden">
       <motion.main
@@ -377,22 +390,35 @@ export default function Home() {
                               li: ({ children }) => (
                                 <li className="mb-1">{children}</li>
                               ),
-                              a: ({ href, children }) => (
-                                <a
-                                  href="#"
-                                  onClick={(e) => {
-                                    e.preventDefault();
-                                    if (!isStreaming) {
-                                      setPendingUrl(href || "");
-                                      setShowExternalDialog(true);
-                                    }
-                                  }}
-                                  className="text-blue-500 hover:underline"
-                                >
-                                  {children}{" "}
-                                  <ExternalLink className="inline h-3 w-3" />
-                                </a>
-                              ),
+                              a: ({ href, children }) => {
+                                const { lastQuestion, lastResponse } =
+                                  getLastConversationContext();
+                                return (
+                                  <a
+                                    href="#"
+                                    onClick={(e) => {
+                                      e.preventDefault();
+                                      if (!isStreaming) {
+                                        setPendingUrl(href || "");
+                                        setShowExternalDialog(true);
+                                        logEvent("external_link_clicked", {
+                                          url: href || "",
+                                          context: "chat_message",
+                                          lastQuestion,
+                                          lastResponse,
+                                          teamId:
+                                            process.env.NEXT_PUBLIC_TEAM_ID ||
+                                            "",
+                                        });
+                                      }
+                                    }}
+                                    className="text-blue-500 hover:underline"
+                                  >
+                                    {children}{" "}
+                                    <ExternalLink className="inline h-3 w-4" />
+                                  </a>
+                                );
+                              },
                               code: ({ children }) => (
                                 <code className="bg-muted-foreground/20 rounded px-1 py-0.5 text-xs">
                                   {children}
@@ -490,6 +516,11 @@ export default function Home() {
               onClick={() => {
                 setPendingUrl("https://docs.autonolas.network/get_started/");
                 setShowExternalDialog(true);
+                logEvent("external_link_clicked", {
+                  url: "https://docs.autonolas.network/get_started/",
+                  context: "launch_agent_button",
+                  teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+                });
               }}
             >
               Launch your agent
@@ -501,6 +532,11 @@ export default function Home() {
               onClick={() => {
                 setPendingUrl("https://docs.olas.network");
                 setShowExternalDialog(true);
+                logEvent("external_link_clicked", {
+                  url: "https://docs.olas.network",
+                  context: "documentation_button",
+                  teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+                });
               }}
             >
               Documentation
