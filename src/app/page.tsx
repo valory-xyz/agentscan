@@ -511,8 +511,10 @@ export default function Home() {
             <Button
               className="w-full md:w-auto"
               onClick={() => {
-                setPendingUrl("https://docs.autonolas.network/get_started");
-                setShowExternalDialog(true);
+                if (!isStreaming) {
+                  setPendingUrl("https://docs.autonolas.network/get_started");
+                  setShowExternalDialog(true);
+                }
               }}
             >
               Launch your agent
@@ -522,8 +524,10 @@ export default function Home() {
               variant="outline"
               className="w-full md:w-auto bg-purple-600 text-white hover:bg-purple-700"
               onClick={() => {
-                setPendingUrl("https://docs.olas.network");
-                setShowExternalDialog(true);
+                if (!isStreaming) {
+                  setPendingUrl("https://docs.olas.network");
+                  setShowExternalDialog(true);
+                }
               }}
             >
               Documentation
