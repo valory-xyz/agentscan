@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 "use client";
 
 import React, { useEffect } from "react";
@@ -52,7 +53,7 @@ export default function ClientLayout({
           href="https://olas.network"
           target="_blank"
           className="absolute right-14 bottom-4"
-          onClick={(e) => {
+          onClick={() => {
             logEvent("external_link_clicked", {
               url: "https://olas.network/",
               context: "footer_link",
