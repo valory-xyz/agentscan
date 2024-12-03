@@ -271,6 +271,21 @@ export default function Home() {
     }
   };
 
+  const [showChat, setShowChat] = useState(false);
+
+  if (!showChat) {
+    return (
+      <Onboarding 
+        onStartChat={() => {
+          setShowChat(true);
+          logEvent("chat_started", {
+            teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+          });
+        }} 
+      />
+    );
+  }
+
   return (
     <div className="bg-white flex flex-col min-h-[calc(100vh-200px)]">
       {showLanding ? (
