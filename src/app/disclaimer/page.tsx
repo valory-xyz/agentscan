@@ -49,12 +49,31 @@ export default function DisclaimerPage() {
         </section>
 
         <section>
+          <h2 className="text-xl font-bold mb-2">Privacy and Data Collection</h2>
+          <p>
+            Agentscan may collect data on user queries, including but not limited to query text, metadata, and timestamps, 
+            to improve the product's functionality and user experience. This data is collected, stored, and processed in 
+            accordance with Explore Labs, Inc.'s Privacy Policy. By using Agentscan, you consent to this data collection 
+            and agree to the terms outlined in the Privacy Policy. Personal data, if provided, will be handled with care 
+            and in compliance with applicable privacy laws. Users should avoid inputting sensitive or confidential 
+            information into the system.
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-xl font-bold mb-2">User Responsibilities</h2>
           <ul className="list-disc pl-5 space-y-2">
             <li>Users must be of legal age and comply with all applicable laws.</li>
             <li>Users bear sole responsibility for independently verifying all information provided by Agentscan.</li>
             <li>Users are solely responsible for ensuring compliance with any tax obligations arising from the use of Agentscan.</li>
           </ul>
+        </section>
+
+        <section>
+          <p className="text-sm text-gray-600 mt-8">
+            This Disclaimer & Privacy Policy was last updated on December 3, 2024. Should you have any questions or 
+            require further information, please contact Explore Labs, Inc. directly.
+          </p>
         </section>
       </div>
     </div>
