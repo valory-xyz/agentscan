@@ -1,6 +1,6 @@
 import localFont from "next/font/local";
 import "./globals.css";
-import { Metadata } from "next";
+
 import ClientLayout from "./ClientLayout";
 const geistSans = localFont({
   src: "./fonts/GeistVF.woff",
@@ -13,9 +13,31 @@ const geistMono = localFont({
   weight: "100 900",
 });
 
-export const metadata: Metadata = {
+export const metadata = {
   title: "Agentscan",
   description: "agentscan",
+  openGraph: {
+    title: "Agentscan",
+    description: "Agentscan",
+    siteName: "Agentscan",
+    images: ["/favicon.svg"],
+    locale: "en_US",
+    type: "website",
+  },
+  twitter: {
+    card: "summary_large_image",
+    title: "Agentscan",
+    description: "agentscan",
+    images: ["/favicon.svg"],
+  },
+  icons: {
+    icon: [
+      {
+        url: "/favicon.svg",
+        type: "image/svg+xml",
+      },
+    ],
+  },
 };
 
 // const BackgroundStars = () => {
