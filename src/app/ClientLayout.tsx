@@ -26,13 +26,28 @@ export default function ClientLayout({
       className={`${geistSansVariable} ${geistMonoVariable} min-h-screen flex flex-col`}
     >
       <div className="fixed top-0 left-0 w-full bg-transparent z-50">
-        <div className="">
+        <div className="flex justify-between items-center px-4">
           <Link href="/" className="text-xl font-bold">
-            <div className="flex flex-row max-h-16 items-center space-x-0">
+            <div className="flex flex-row max-h-16 items-center space-x-0 text-black hover:text-purple-600 transition-colors">
               <AnimatedRobot scale={0.45} />
               agentscan
             </div>
           </Link>
+
+          <a
+            href="https://t.me/ExploreSupport"
+            target="_blank"
+            className="text-md text-black hover:text-purple-600 transition-colors font-bold"
+            onClick={() => {
+              logEvent("external_link_clicked", {
+                url: "https://t.me/ExploreSupport",
+                context: "feedback_link",
+                teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+              });
+            }}
+          >
+            Give Feedback
+          </a>
         </div>
       </div>
 
