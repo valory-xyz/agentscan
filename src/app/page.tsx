@@ -28,6 +28,7 @@ import {
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { getUserId, logEvent } from "../lib/amplitude";
+import ExternalLinkDialog from "@/components/ExternalLinkDialog";
 
 export default function Home() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -61,42 +62,9 @@ export default function Home() {
     "How do I make my own agent?",
   ];
 
-  const [showExternalDialog, setShowExternalDialog] = useState(false);
-  const [pendingUrl, setPendingUrl] = useState("");
+  const [externalUrl, setExternalUrl] = useState<string | null>(null);
 
   const cleanUrl = (url: string) => url.replace(/\/+$/, "");
-
-  const ExternalLinkDialog = () => (
-    <AlertDialog open={showExternalDialog}>
-      <AlertDialogContent>
-        <AlertDialogHeader>
-          <AlertDialogTitle>Leaving Agentscan</AlertDialogTitle>
-          <AlertDialogDescription>
-            You are about to leave Agentscan to visit an external website.
-            Please note that we cannot guarantee the safety or reliability of
-            external sites. Use any external software at your own risk.
-          </AlertDialogDescription>
-        </AlertDialogHeader>
-        <AlertDialogFooter>
-          <AlertDialogCancel onClick={() => setShowExternalDialog(false)}>
-            Cancel
-          </AlertDialogCancel>
-          <AlertDialogAction
-            onClick={() => {
-              logEvent("external_link_clicked", {
-                url: cleanUrl(pendingUrl),
-                teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-              });
-              window.open(cleanUrl(pendingUrl), "_blank");
-              setShowExternalDialog(false);
-            }}
-          >
-            Continue
-          </AlertDialogAction>
-        </AlertDialogFooter>
-      </AlertDialogContent>
-    </AlertDialog>
-  );
 
   useEffect(() => {
     const container = messagesContainerRef.current;
@@ -397,17 +365,12 @@ export default function Home() {
                                 <li className="mb-1">{children}</li>
                               ),
                               a: ({ href, children }) => {
-                                const { lastQuestion, lastResponse } =
-                                  getLastConversationContext();
                                 return (
                                   <a
                                     href="#"
                                     onClick={(e) => {
                                       e.preventDefault();
-                                      if (!isStreaming) {
-                                        setPendingUrl(href || "");
-                                        setShowExternalDialog(true);
-                                      }
+                                      setExternalUrl(href || null);
                                     }}
                                     className="text-blue-500 hover:underline"
                                   >
@@ -511,10 +474,9 @@ export default function Home() {
             <Button
               className="w-full md:w-auto"
               onClick={() => {
-                if (!isStreaming) {
-                  setPendingUrl("https://docs.autonolas.network/get_started");
-                  setShowExternalDialog(true);
-                }
+                setExternalUrl(
+                  "https://docs.autonolas.network/open-autonomy/guides/quick_start"
+                );
               }}
             >
               Launch your agent
@@ -524,10 +486,7 @@ export default function Home() {
               variant="outline"
               className="w-full md:w-auto bg-purple-600 text-white hover:bg-purple-700"
               onClick={() => {
-                if (!isStreaming) {
-                  setPendingUrl("https://docs.olas.network");
-                  setShowExternalDialog(true);
-                }
+                setExternalUrl("https://docs.autonolas.network");
               }}
             >
               Documentation
@@ -536,7 +495,18 @@ export default function Home() {
           </div>
         </main>
       </motion.div>
-      <ExternalLinkDialog />
+      <ExternalLinkDialog
+        url={externalUrl}
+        onClose={() => setExternalUrl(null)}
+        onConfirm={(url) => {
+          logEvent("external_link_clicked", {
+            url: cleanUrl(url),
+            teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+          });
+          window.open(cleanUrl(url), "_blank");
+          setExternalUrl(null);
+        }}
+      />
       <Toaster />
     </div>
   );
