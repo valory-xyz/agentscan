@@ -1,7 +1,7 @@
 export default function DisclaimerPage() {
   return (
     <div className="container mx-auto px-4 py-8 max-w-3xl mb-20">
-      <h1 className="text-3xl font-bold mb-6">Disclaimer & Privacy Policy</h1>
+      <h1 className="text-3xl font-bold mb-6">Disclaimer &amp; Privacy Policy</h1>
       
       <p className="mb-6 text-lg">
         By using Agentscan, you agree to the following terms and conditions:
@@ -25,12 +25,12 @@ export default function DisclaimerPage() {
 
         <section>
           <h2 className="text-xl font-bold mb-2">Use at Your Own Risk</h2>
-          <p>Agentscan is offered on an "as is" and "as available" basis without warranties of any kind, express or implied. Your use of the product is at your own risk.</p>
+          <p>Agentscan is offered on an &quot;as is&quot; and &quot;as available&quot; basis without warranties of any kind, express or implied. Your use of the product is at your own risk.</p>
         </section>
 
         <section>
           <h2 className="text-xl font-bold mb-2">Limitations of Large Language Models (LLMs)</h2>
-          <p>Agentscan utilizes LLM technology, which may generate inaccurate or misleading information ("hallucinations"). Users must independently verify all outputs before acting on them.</p>
+          <p>Agentscan utilizes LLM technology, which may generate inaccurate or misleading information (&quot;hallucinations&quot;). Users must independently verify all outputs before acting on them.</p>
         </section>
 
         <section>
