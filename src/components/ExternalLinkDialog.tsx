@@ -21,7 +21,6 @@ const ExternalLinkDialog: React.FC<ExternalLinkDialogProps> = ({
   onClose,
   onConfirm,
 }) => {
-  console.log("url", url);
   return (
     <AlertDialog open={!!url}>
       <AlertDialogContent>
