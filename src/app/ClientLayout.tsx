@@ -53,7 +53,7 @@ export default function ClientLayout({
 
       <main className="flex-1 mt-20 flex flex-col">{children}</main>
 
-      <footer className="w-full py-4 bg-muted/50 mt-auto">
+      <footer className="w-full py-4 bg-muted/50 mt-auto fixed bottom-0">
         <div className="container mx-auto px-4 relative">
           <div className="flex flex-col items-center">
             <p className="text-sm text-muted-foreground max-w-2xl mx-auto">

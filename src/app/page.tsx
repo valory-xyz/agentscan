@@ -29,6 +29,7 @@ import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
 import { getUserId, logEvent } from "../lib/amplitude";
 import ExternalLinkDialog from "@/components/ExternalLinkDialog";
+import Onboarding from "@/components/Onboarding";
 
 export default function Home() {
   const messagesContainerRef = useRef<HTMLDivElement>(null);
@@ -233,7 +234,7 @@ export default function Home() {
       case "Can you tell me how to stake OLAS in the easiest way possible?":
         return "💰";
       case "Give me content I can look at to learn more about OLAS":
-        return "📚";
+        return "";
       default:
         return "❓";
     }
@@ -252,249 +253,276 @@ export default function Home() {
     };
   };
 
-  return (
-    <div className="bg-white flex flex-col relative overflow-hidden">
-      <motion.main
-        className="flex-grow container mx-auto px-4 py-8 max-w-5xl flex flex-col justify-center"
-        initial={false}
-        animate={{
-          x: "-100%",
-          opacity: 0,
-          display: "none",
-        }}
-        transition={{
-          duration: 1.2,
-          ease: [0.4, 0, 0.2, 1],
-        }}
-      >
-        {/* Landing page content */}
-        <div className="min-h-screen bg-white flex flex-col relative">
-          <main className="flex-grow container mx-auto px-4 py-8 max-w-5xl flex flex-col justify-center relative"></main>
-        </div>
-      </motion.main>
+  const [showLanding, setShowLanding] = useState(true);
+  const [hasSeenLanding, setHasSeenLanding] = useState(false);
 
-      <motion.div
-        initial={false}
-        animate={{
-          x: 0,
-          opacity: 1,
-          display: "block",
-        }}
-        transition={{
-          duration: 1.2,
-          ease: [0.4, 0, 0.2, 1],
-          delay: 0.3,
-        }}
-      >
-        {/* Chat interface */}
-        <main className="flex-grow w-full container mx-auto px-2 md:px-4 py-2 max-w-6xl flex flex-col justify-center">
-          <Card className="w-full max-w-full mx-auto h-[85vh] md:h-[70vh] flex flex-col">
-            <CardContent className="p-2 md:p-4 flex flex-col h-full">
-              <div
-                ref={messagesContainerRef}
-                className="flex-1 overflow-y-auto mb-4"
-              >
-                {messages.map((message, i) => (
-                  <div
-                    key={i}
-                    className={`flex mb-4 ${
-                      message.role === "user" ? "justify-end" : "justify-start"
-                    }`}
-                  >
+  useEffect(() => {
+    const hasSeenBefore = localStorage.getItem("hasSeenLanding") === "true";
+    setHasSeenLanding(hasSeenBefore);
+    setShowLanding(!hasSeenBefore);
+  }, []);
+
+  const handleStartChat = () => {
+    setShowLanding(false);
+    localStorage.setItem("hasSeenLanding", "true");
+    setHasSeenLanding(true);
+
+    if (!hasSeenLanding) {
+      logEvent("landing_page_viewed", {
+        teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+      });
+    }
+  };
+
+  return (
+    <div className="bg-white flex flex-col min-h-[calc(100vh-200px)]">
+      {showLanding ? (
+        <motion.main
+          className="flex-1 flex items-center justify-center px-4"
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            duration: 0.5,
+            ease: "easeInOut",
+          }}
+        >
+          <Onboarding onStartChat={handleStartChat} />
+        </motion.main>
+      ) : (
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            duration: 0.5,
+            ease: "easeInOut",
+          }}
+        >
+          {/* Chat interface */}
+          <main className="flex-grow w-full container mx-auto px-2 md:px-4 py-2 max-w-6xl flex flex-col justify-center">
+            <Card className="w-full max-w-full mx-auto h-[85vh] md:h-[70vh] flex flex-col">
+              <div className="p-2 border-b flex justify-end">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowLanding(true)}
+                  className="text-gray-500 hover:text-gray-700"
+                >
+                  <Bot className="h-4 w-4 mr-2" />
+                  About Agent Scan
+                </Button>
+              </div>
+              <CardContent className="p-2 md:p-4 flex flex-col h-full">
+                <div
+                  ref={messagesContainerRef}
+                  className="flex-1 overflow-y-auto mb-4"
+                >
+                  {messages.map((message, i) => (
                     <div
-                      className={`flex items-start gap-3 max-w-[80%] ${
+                      key={i}
+                      className={`flex mb-4 ${
                         message.role === "user"
-                          ? "flex-row-reverse"
-                          : "flex-row"
+                          ? "justify-end"
+                          : "justify-start"
                       }`}
                     >
                       <div
-                        className={`${
-                          message.role === "user" ? "hidden" : "block"
+                        className={`flex items-start gap-3 max-w-[80%] ${
+                          message.role === "user"
+                            ? "flex-row-reverse"
+                            : "flex-row"
                         }`}
                       >
+                        <div
+                          className={`${
+                            message.role === "user" ? "hidden" : "block"
+                          }`}
+                        >
+                          <Avatar className="h-8 w-8 flex-shrink-0">
+                            <AvatarFallback className="bg-purple-100">
+                              <AnimatedRobot scale={0.2} />
+                            </AvatarFallback>
+                          </Avatar>
+                        </div>
+                        <motion.div
+                          initial="initial"
+                          animate="animate"
+                          variants={{
+                            initial: {
+                              opacity: 0,
+                              x: message.role === "user" ? 20 : -20,
+                            },
+                            animate: { opacity: 1, x: 0 },
+                          }}
+                          transition={{
+                            duration: 0.8,
+                            ease: "easeOut",
+                          }}
+                          className={`rounded-lg px-4 py-2 ${
+                            message.role === "user"
+                              ? "bg-purple-500 text-white"
+                              : "bg-muted"
+                          }`}
+                        >
+                          <div
+                            className={`prose prose-sm dark:prose-invert max-w-none ${
+                              message.role === "user"
+                                ? "prose-invert text-white"
+                                : ""
+                            }`}
+                          >
+                            <ReactMarkdown
+                              components={{
+                                p: ({ children }) => (
+                                  <p className="mb-2 last:mb-0">{children}</p>
+                                ),
+                                ul: ({ children }) => (
+                                  <ul className="list-disc ml-4 mb-2">
+                                    {children}
+                                  </ul>
+                                ),
+                                ol: ({ children }) => (
+                                  <ol className="list-decimal ml-4 mb-2">
+                                    {children}
+                                  </ol>
+                                ),
+                                li: ({ children }) => (
+                                  <li className="mb-1">{children}</li>
+                                ),
+                                a: ({ href, children }) => {
+                                  return (
+                                    <a
+                                      href="#"
+                                      onClick={(e) => {
+                                        e.preventDefault();
+                                        setExternalUrl(href || null);
+                                      }}
+                                      className="text-blue-500 hover:underline"
+                                    >
+                                      {children}{" "}
+                                      <ExternalLink className="inline h-3 w-4" />
+                                    </a>
+                                  );
+                                },
+                                code: ({ children }) => (
+                                  <code className="bg-muted-foreground/20 rounded px-1 py-0.5 text-xs">
+                                    {children}
+                                  </code>
+                                ),
+                                pre: ({ children }) => (
+                                  <pre className=" rounded p-2 overflow-x-auto my-2 text-xs">
+                                    {children}
+                                  </pre>
+                                ),
+                              }}
+                            >
+                              {message.content}
+                            </ReactMarkdown>
+                          </div>
+                        </motion.div>
+                      </div>
+                    </div>
+                  ))}
+                  {isLoading && (
+                    <div className="flex mb-4 justify-start">
+                      <div className="flex items-start gap-3 max-w-[80%]">
                         <Avatar className="h-8 w-8 flex-shrink-0">
                           <AvatarFallback className="bg-purple-100">
                             <AnimatedRobot scale={0.2} />
                           </AvatarFallback>
                         </Avatar>
-                      </div>
-                      <motion.div
-                        initial="initial"
-                        animate="animate"
-                        variants={{
-                          initial: {
-                            opacity: 0,
-                            x: message.role === "user" ? 20 : -20,
-                          },
-                          animate: { opacity: 1, x: 0 },
-                        }}
-                        transition={{
-                          duration: 0.8,
-                          ease: "easeOut",
-                        }}
-                        className={`rounded-lg px-4 py-2 ${
-                          message.role === "user"
-                            ? "bg-purple-500 text-white"
-                            : "bg-muted"
-                        }`}
-                      >
-                        <div
-                          className={`prose prose-sm dark:prose-invert max-w-none ${
-                            message.role === "user"
-                              ? "prose-invert text-white"
-                              : ""
-                          }`}
-                        >
-                          <ReactMarkdown
-                            components={{
-                              p: ({ children }) => (
-                                <p className="mb-2 last:mb-0">{children}</p>
-                              ),
-                              ul: ({ children }) => (
-                                <ul className="list-disc ml-4 mb-2">
-                                  {children}
-                                </ul>
-                              ),
-                              ol: ({ children }) => (
-                                <ol className="list-decimal ml-4 mb-2">
-                                  {children}
-                                </ol>
-                              ),
-                              li: ({ children }) => (
-                                <li className="mb-1">{children}</li>
-                              ),
-                              a: ({ href, children }) => {
-                                return (
-                                  <a
-                                    href="#"
-                                    onClick={(e) => {
-                                      e.preventDefault();
-                                      setExternalUrl(href || null);
-                                    }}
-                                    className="text-blue-500 hover:underline"
-                                  >
-                                    {children}{" "}
-                                    <ExternalLink className="inline h-3 w-4" />
-                                  </a>
-                                );
-                              },
-                              code: ({ children }) => (
-                                <code className="bg-muted-foreground/20 rounded px-1 py-0.5 text-xs">
-                                  {children}
-                                </code>
-                              ),
-                              pre: ({ children }) => (
-                                <pre className=" rounded p-2 overflow-x-auto my-2 text-xs">
-                                  {children}
-                                </pre>
-                              ),
-                            }}
-                          >
-                            {message.content}
-                          </ReactMarkdown>
+                        <div className="bg-muted rounded-lg px-4 py-2">
+                          <Loader2 className="h-4 w-4 animate-spin" />
                         </div>
-                      </motion.div>
-                    </div>
-                  </div>
-                ))}
-                {isLoading && (
-                  <div className="flex mb-4 justify-start">
-                    <div className="flex items-start gap-3 max-w-[80%]">
-                      <Avatar className="h-8 w-8 flex-shrink-0">
-                        <AvatarFallback className="bg-purple-100">
-                          <AnimatedRobot scale={0.2} />
-                        </AvatarFallback>
-                      </Avatar>
-                      <div className="bg-muted rounded-lg px-4 py-2">
-                        <Loader2 className="h-4 w-4 animate-spin" />
                       </div>
                     </div>
-                  </div>
-                )}
-                <div ref={messagesEndRef} />
-              </div>
+                  )}
+                  <div ref={messagesEndRef} />
+                </div>
 
-              <div className="mt-auto">
-                <form onSubmit={handleSubmit} className="relative mb-2 md:mb-4">
-                  <Input
-                    value={query}
-                    onChange={(e) => setQuery(e.target.value)}
-                    placeholder="Ask Andy Anything..."
-                    className="w-full h-12 md:h-14 pl-3 md:pl-5 pr-12 md:pr-14 text-sm md:text-base"
-                    disabled={isLoading}
-                  />
-                  <Button
-                    type="submit"
-                    size="icon"
-                    className="absolute right-2 top-2 md:top-3 h-8 w-8 bg-purple-600 hover:bg-purple-700 text-white"
-                    disabled={isLoading}
+                <div className="mt-auto">
+                  <form
+                    onSubmit={handleSubmit}
+                    className="relative mb-2 md:mb-4"
                   >
-                    <Send className="h-4 w-4" />
-                    <span className="sr-only">Send</span>
-                  </Button>
-                </form>
+                    <Input
+                      value={query}
+                      onChange={(e) => setQuery(e.target.value)}
+                      placeholder="Ask Andy Anything..."
+                      className="w-full h-12 md:h-14 pl-3 md:pl-5 pr-12 md:pr-14 text-sm md:text-base"
+                      disabled={isLoading}
+                    />
+                    <Button
+                      type="submit"
+                      size="icon"
+                      className="absolute right-2 top-2 md:top-3 h-8 w-8 bg-purple-600 hover:bg-purple-700 text-white"
+                      disabled={isLoading}
+                    >
+                      <Send className="h-4 w-4" />
+                      <span className="sr-only">Send</span>
+                    </Button>
+                  </form>
 
-                <div className="flex flex-wrap gap-1 md:gap-2 justify-center">
-                  <div className="hidden md:flex md:flex-wrap md:gap-2 md:justify-center">
-                    {exampleQuestions.map((question, index) => {
-                      return (
+                  <div className="flex flex-wrap gap-1 md:gap-2 justify-center">
+                    <div className="hidden md:flex md:flex-wrap md:gap-2 md:justify-center">
+                      {exampleQuestions.map((question, index) => {
+                        return (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            onClick={() => handleQuestionClick(question)}
+                            className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
+                          >
+                            {getEmoji(question)} {question}
+                          </Button>
+                        );
+                      })}
+                    </div>
+
+                    <div className="flex flex-wrap gap-1 justify-center md:hidden">
+                      {mobileExampleQuestions.map((question, index) => (
                         <Button
                           key={index}
                           variant="outline"
-                          onClick={() => handleQuestionClick(question)}
-                          className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
+                          onClick={() =>
+                            handleQuestionClick(exampleQuestions[index])
+                          }
+                          className="text-gray-600 hover:text-gray-800 text-xs py-1 px-2"
                         >
                           {getEmoji(question)} {question}
                         </Button>
-                      );
-                    })}
-                  </div>
-
-                  <div className="flex flex-wrap gap-1 justify-center md:hidden">
-                    {mobileExampleQuestions.map((question, index) => (
-                      <Button
-                        key={index}
-                        variant="outline"
-                        onClick={() =>
-                          handleQuestionClick(exampleQuestions[index])
-                        }
-                        className="text-gray-600 hover:text-gray-800 text-xs py-1 px-2"
-                      >
-                        {getEmoji(question)} {question}
-                      </Button>
-                    ))}
+                      ))}
+                    </div>
                   </div>
                 </div>
-              </div>
-            </CardContent>
-          </Card>
+              </CardContent>
+            </Card>
 
-          <div className="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-4 mt-4 md:mt-8 max-w-3xl mx-auto px-2">
-            <Button
-              className="w-full md:w-auto"
-              onClick={() => {
-                setExternalUrl(
-                  "https://docs.autonolas.network/open-autonomy/guides/quick_start"
-                );
-              }}
-            >
-              Launch your agent
-              <ExternalLink className="ml-2 h-4 w-4" />
-            </Button>
-            <Button
-              variant="outline"
-              className="w-full md:w-auto bg-purple-600 text-white hover:bg-purple-700"
-              onClick={() => {
-                setExternalUrl("https://docs.autonolas.network");
-              }}
-            >
-              Documentation
-              <ExternalLink className="ml-2 h-4 w-4" />
-            </Button>
-          </div>
-        </main>
-      </motion.div>
+            <div className="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-4 mt-4 md:mt-8 max-w-3xl mx-auto px-2">
+              <Button
+                className="w-full md:w-auto"
+                onClick={() => {
+                  setExternalUrl(
+                    "https://docs.autonolas.network/open-autonomy/guides/quick_start"
+                  );
+                }}
+              >
+                Launch your agent
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </Button>
+              <Button
+                variant="outline"
+                className="w-full md:w-auto bg-purple-600 text-white hover:bg-purple-700"
+                onClick={() => {
+                  setExternalUrl("https://docs.autonolas.network");
+                }}
+              >
+                Documentation
+                <ExternalLink className="ml-2 h-4 w-4" />
+              </Button>
+            </div>
+          </main>
+        </motion.div>
+      )}
       <ExternalLinkDialog
         url={externalUrl}
         onClose={() => setExternalUrl(null)}
