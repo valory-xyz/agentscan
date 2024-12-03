@@ -16,7 +16,7 @@ export default function Onboarding({ onStartChat }: OnboardingProps) {
         className="space-y-6"
       >
         <h1 className="text-4xl md:text-6xl font-bold text-purple-600">
-          Welcome to Agent Scan
+          Welcome to agentscan
         </h1>
         <p className="text-xl md:text-2xl text-gray-600 max-w-2xl mx-auto mb-4">
           Your AI-powered guide to understanding and exploring OLAS AI agents.

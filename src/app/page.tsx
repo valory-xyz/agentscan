@@ -49,7 +49,6 @@ export default function Home() {
   const exampleQuestions = [
     "What is an OLAS Agent?",
     "Give me an example of an OLAS Agent",
-    "Show me a agent that predicts prediction markets",
     "How does the trader agent work?",
     "How do I make my own agent?",
     "Can you tell me how to stake OLAS in the easiest way possible?",
@@ -225,8 +224,6 @@ export default function Home() {
         return "🤖";
       case "Give me an example of an OLAS Agent":
         return "💡";
-      case "Show me a agent that predicts prediction markets":
-        return "🎯";
       case "How does the trader agent work?":
         return "📈";
       case "How do I make my own agent?":
@@ -234,7 +231,7 @@ export default function Home() {
       case "Can you tell me how to stake OLAS in the easiest way possible?":
         return "💰";
       case "Give me content I can look at to learn more about OLAS":
-        return "";
+        return "📚";
       default:
         return "❓";
     }
@@ -308,7 +305,7 @@ export default function Home() {
                   className="text-gray-500 hover:text-gray-700"
                 >
                   <Bot className="h-4 w-4 mr-2" />
-                  About Agent Scan
+                  About agentscan
                 </Button>
               </div>
               <CardContent className="p-2 md:p-4 flex flex-col h-full">
@@ -462,37 +459,24 @@ export default function Home() {
                     </Button>
                   </form>
 
-                  <div className="flex flex-wrap gap-1 md:gap-2 justify-center">
-                    <div className="hidden md:flex md:flex-wrap md:gap-2 md:justify-center">
-                      {exampleQuestions.map((question, index) => {
-                        return (
-                          <Button
-                            key={index}
-                            variant="outline"
-                            onClick={() => handleQuestionClick(question)}
-                            className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
-                          >
-                            {getEmoji(question)} {question}
-                          </Button>
-                        );
-                      })}
-                    </div>
-
-                    <div className="flex flex-wrap gap-1 justify-center md:hidden">
-                      {mobileExampleQuestions.map((question, index) => (
+                  <div className="flex flex-wrap gap-1 md:gap-2 justify-center mb-2">
+                    {exampleQuestions.map((question, index) => {
+                      return (
                         <Button
                           key={index}
                           variant="outline"
-                          onClick={() =>
-                            handleQuestionClick(exampleQuestions[index])
-                          }
-                          className="text-gray-600 hover:text-gray-800 text-xs py-1 px-2"
+                          onClick={() => handleQuestionClick(question)}
+                          className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
                         >
                           {getEmoji(question)} {question}
                         </Button>
-                      ))}
-                    </div>
+                      );
+                    })}
                   </div>
+
+                  <p className="text-sm text-muted-foreground text-center">
+                    Agentscan can make mistakes. Check important info.
+                  </p>
                 </div>
               </CardContent>
             </Card>

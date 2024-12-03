@@ -56,11 +56,21 @@ export default function ClientLayout({
       <footer className="w-full py-4 bg-muted/50 mt-auto fixed bottom-0">
         <div className="container mx-auto px-4 relative">
           <div className="flex flex-col items-center">
-            <p className="text-sm text-muted-foreground max-w-2xl mx-auto">
-              agentscan is a community-driven informational site separate to
-              Autonolas (OLAS), Valory AG or any related products & services.
-              All information and chats are not financial advice. Use at your
-              own risk.
+            <p className="text-sm text-muted-foreground">
+              Copyright Explore Labs, Inc 2024 •{" "}
+              <Link 
+                href="/disclaimer" 
+                className="hover:text-purple-600 transition-colors"
+                onClick={() => {
+                  logEvent("internal_link_clicked", {
+                    url: "/disclaimer",
+                    context: "footer_disclaimer",
+                    teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+                  });
+                }}
+              >
+                Disclaimer & Privacy Policy
+              </Link>
             </p>
           </div>
         </div>
