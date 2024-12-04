@@ -25,29 +25,29 @@ function Header() {
         </Link>
 
         <div className="flex items-center gap-4">
-          <a
-            href="https://t.me/ExploreSupport"
-            target="_blank"
-            className="text-md text-black hover:text-purple-600 transition-colors font-bold"
+          <Button
+            variant="ghost"
+            className="text-white hover:text-black bg-purple-600 transition-colors"
             onClick={() => {
               logEvent("external_link_clicked", {
                 url: "https://t.me/ExploreSupport",
                 context: "feedback_link",
                 teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
               });
+              window.open("https://t.me/ExploreSupport", "_blank");
             }}
           >
             Give Feedback
-          </a>
+          </Button>
 
           {isAuthenticated ? (
             <Button
               variant="ghost"
               onClick={logout}
-              className="text-black hover:text-purple-600 transition-colors"
+              className="text-white hover:text-black bg-black transition-colors"
             >
-              <LogOut className="h-4 w-4 mr-2" />
               Sign Out
+              <LogOut className="h-4 w-4" />
             </Button>
           ) : (
             <Button
@@ -55,10 +55,10 @@ function Header() {
               onClick={() => {
                 login();
               }}
-              className="text-black hover:text-purple-600 transition-colors"
+              className="text-white hover:text-black bg-black transition-colors"
             >
-              <LogIn className="h-4 w-4 mr-2" />
               Sign In
+              <LogIn className="h-4 w-4" />
             </Button>
           )}
         </div>
