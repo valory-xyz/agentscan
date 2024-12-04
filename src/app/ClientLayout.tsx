@@ -19,7 +19,7 @@ function Header() {
       <div className="flex justify-between items-center px-2 md:px-4 py-2">
         <Link href="/" className="text-lg md:text-xl font-bold">
           <div className="flex flex-row max-h-16 items-center space-x-0 text-black hover:text-purple-600 transition-colors">
-            <AnimatedRobot scale={0.35} className="md:scale-45" />
+            <AnimatedRobot scale={0.35} />
             <span className="hidden sm:inline">agentscan</span>
           </div>
         </Link>
