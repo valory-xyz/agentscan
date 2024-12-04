@@ -27,7 +27,7 @@ import {
 } from "@/components/ui/alert-dialog";
 import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { getUserId, logEvent } from "../lib/amplitude";
+import { logEvent } from "../lib/amplitude";
 import ExternalLinkDialog from "@/components/ExternalLinkDialog";
 import Onboarding from "@/components/Onboarding";
 import { useAuth } from "@/hooks/use-auth";

@@ -4,7 +4,7 @@
 import React, { useEffect } from "react";
 import AnimatedRobot from "@/components/AnimatedRobot";
 import Link from "next/link";
-import { initAmplitude, logEvent } from "@/lib/amplitude";
+import { initAmplitude, logEvent, setUserId } from "@/lib/amplitude";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -12,7 +12,11 @@ import { LogOut, LogIn } from "lucide-react";
 
 // Create a separate header component to use hooks
 function Header() {
-  const { isAuthenticated, login, logout } = useAuth();
+  const { isAuthenticated, login, logout, user } = useAuth();
+
+  useEffect(() => {
+    setUserId(user?.id || null);
+  }, [user]);
 
   return (
     <div className="fixed top-0 left-0 w-full bg-transparent z-50">
