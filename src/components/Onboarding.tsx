@@ -1,6 +1,7 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
+import { logEvent } from "@/lib/amplitude";
 
 interface OnboardingProps {
   onStartChat: () => void;
@@ -19,9 +20,24 @@ export default function Onboarding({ onStartChat }: OnboardingProps) {
           Welcome to agentscan
         </h1>
         <p className="text-lg md:text-2xl text-gray-600 max-w-2xl mx-auto mb-4">
-          Your AI-powered guide to understanding and exploring OLAS AI agents.
-          Ask questions, get examples, and learn how to build your own
-          autonomous agents.
+          Your AI-powered guide to understanding and exploring{" "}
+          <a
+            href="https://olas.network"
+            target="_blank"
+            rel="noopener noreferrer"
+            className="text-purple-600 hover:text-purple-700"
+            onClick={() => {
+              logEvent("external_link_clicked", {
+                url: "https://olas.network",
+                context: "olas_link",
+                teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+              });
+            }}
+          >
+            Olas
+          </a>{" "}
+          AI agents. Ask questions, get examples, and learn how to build your
+          own autonomous agents.
         </p>
       </motion.div>
 

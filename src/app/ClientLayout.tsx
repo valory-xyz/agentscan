@@ -20,7 +20,7 @@ function Header() {
         <Link href="/" className="text-lg md:text-xl font-bold">
           <div className="flex flex-row max-h-16 items-center space-x-0 text-black hover:text-purple-600 transition-colors">
             <AnimatedRobot scale={0.35} />
-            <span className="hidden sm:inline">agentscan</span>
+            <span className="inline">agentscan</span>
           </div>
         </Link>
 
@@ -46,7 +46,7 @@ function Header() {
               onClick={logout}
               className="text-white hover:text-black bg-black transition-colors text-sm md:text-base px-2 md:px-4"
             >
-              <span className="hidden sm:inline">Sign Out</span>
+              <span className="inline">Sign Out</span>
               <LogOut className="h-4 w-4 sm:ml-2" />
             </Button>
           ) : (
@@ -57,7 +57,7 @@ function Header() {
               }}
               className="text-white hover:text-black bg-black transition-colors text-sm md:text-base px-2 md:px-4"
             >
-              <span className="hidden sm:inline">Sign In</span>
+              <span className="inline">Sign In</span>
               <LogIn className="h-4 w-4 sm:ml-2" />
             </Button>
           )}
