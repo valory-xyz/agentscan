@@ -1,3 +1,4 @@
+import { logEvent } from "@/lib/amplitude";
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect } from "react";
 
@@ -11,13 +12,21 @@ export function useAuth() {
       Authorization: `Bearer ${await getAccessToken()}`,
     };
 
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
-      method: "POST",
-      headers,
-      body: JSON.stringify({
-        userId: user?.id,
-      }),
-    });
+    const userResponse = await fetch(
+      `${process.env.NEXT_PUBLIC_API_URL}/auth`,
+      {
+        method: "POST",
+        headers,
+        body: JSON.stringify({
+          userId: user?.id,
+        }),
+      }
+    );
+    if (userResponse.ok) {
+      logEvent("user_signed_in", {
+        teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+      });
+    }
   };
 
   const signIn = async () => {
