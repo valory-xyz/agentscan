@@ -57,13 +57,6 @@ export default function Home() {
     "Give me content I can look at to learn more about OLAS",
   ];
 
-  const mobileExampleQuestions = [
-    "What is an OLAS Agent?",
-    "Give me an example of an OLAS Agent",
-    "How to stake OLAS?",
-    "How do I make my own agent?",
-  ];
-
   const [externalUrl, setExternalUrl] = useState<string | null>(null);
 
   const cleanUrl = (url: string) => url.replace(/\/+$/, "");
@@ -362,10 +355,10 @@ export default function Home() {
                   About agentscan
                 </Button>
               </div>
-              <CardContent className="p-2 md:p-4 flex flex-col h-full">
+              <CardContent className="p-2 md:p-4 flex flex-col h-full overflow-hidden">
                 <div
                   ref={messagesContainerRef}
-                  className="flex-1 overflow-y-auto mb-4"
+                  className="flex-1 overflow-y-auto mb-4 min-h-0"
                 >
                   {messages.map((message, i) => (
                     <div
@@ -490,7 +483,7 @@ export default function Home() {
                   <div ref={messagesEndRef} />
                 </div>
 
-                <div className="mt-auto">
+                <div className="shrink-0 mt-auto">
                   <form
                     onSubmit={handleSubmit}
                     className="relative mb-2 md:mb-4"
@@ -513,7 +506,7 @@ export default function Home() {
                     </Button>
                   </form>
 
-                  <div className="flex flex-wrap gap-1 md:gap-2 justify-center mb-2">
+                  <div className="flex flex-wrap gap-1 md:gap-2 justify-center mb-2 shrink-0">
                     {exampleQuestions.map((question, index) => {
                       return (
                         <Button
@@ -528,7 +521,7 @@ export default function Home() {
                     })}
                   </div>
 
-                  <p className="text-sm text-muted-foreground text-center">
+                  <p className="text-sm text-muted-foreground text-center shrink-0">
                     Agentscan can make mistakes. Check important info.
                   </p>
                 </div>
