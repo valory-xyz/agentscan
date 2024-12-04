@@ -520,7 +520,7 @@ export default function Home() {
                 className="w-full md:w-auto text-white bg-purple-600 hover:bg-white hover:text-black"
                 onClick={() => {
                   setExternalUrl(
-                    "https://docs.autonolas.network/open-autonomy/guides/quick_start"
+                    "https://operate.olas.network/agents"
                   );
                 }}
               >
