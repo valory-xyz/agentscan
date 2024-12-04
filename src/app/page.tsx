@@ -126,7 +126,6 @@ export default function Home() {
 
       if (response.status === 429) {
         const data = await response.json();
-        //check if data.error is "You have reached the maximum number of free requests. Please sign in to continue using the service."
 
         if (
           data.error ===
@@ -220,7 +219,7 @@ export default function Home() {
 
   const handleSubmit = async (e: React.FormEvent) => {
     e.preventDefault();
-    if (!query.trim() || isLoading) return;
+    if (!query.trim() || isLoading || isStreaming) return;
 
     const userMessage = { role: "user", content: query };
     setMessages((prev) => [...prev, userMessage]);
@@ -229,12 +228,13 @@ export default function Home() {
     await sendMessage(query, newMessages);
   };
 
-  const handleQuestionClick = async (question: string) => {
-    const userMessage = { role: "user", content: question };
-    setMessages((prev) => [...prev, userMessage]);
-    setQuery("");
-    const newMessages = [...messages, userMessage];
-    await sendMessage(question, newMessages);
+  const handleQuestionClick = (question: string) => {
+    if (isLoading || isStreaming) return;
+
+    setQuery(question);
+
+    const syntheticEvent = { preventDefault: () => {} } as React.FormEvent;
+    handleSubmit(syntheticEvent);
   };
 
   const getEmoji = (q: string) => {
@@ -304,12 +304,14 @@ export default function Home() {
           }}
         >
           <main className="flex-grow w-full container mx-auto px-2 md:px-4 py-2 max-w-6xl flex flex-col justify-center h-[85vh] md:h-[70vh]">
-            <Onboarding onStartChat={() => {
-              setShowChat(true);
-              logEvent("chat_started", {
-                teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-              });
-            }} />
+            <Onboarding
+              onStartChat={() => {
+                setShowChat(true);
+                logEvent("chat_started", {
+                  teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+                });
+              }}
+            />
           </main>
         </motion.div>
       </div>
@@ -491,13 +493,13 @@ export default function Home() {
                       onChange={(e) => setQuery(e.target.value)}
                       placeholder="Ask Andy Anything..."
                       className="w-full h-12 md:h-14 pl-3 md:pl-5 pr-12 md:pr-14 text-sm md:text-base"
-                      disabled={isLoading}
+                      disabled={isLoading || isStreaming}
                     />
                     <Button
                       type="submit"
                       size="icon"
                       className="absolute right-2 top-2 md:top-3 h-8 w-8 bg-purple-600 hover:bg-purple-700 text-white"
-                      disabled={isLoading}
+                      disabled={isLoading || isStreaming || !query.trim()}
                     >
                       <Send className="h-4 w-4" />
                       <span className="sr-only">Send</span>

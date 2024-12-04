@@ -11,14 +11,13 @@ export function useAuth() {
       Authorization: `Bearer ${await getAccessToken()}`,
     };
 
-    const response = await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
+    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
       method: "POST",
       headers,
       body: JSON.stringify({
         userId: user?.id,
       }),
     });
-    console.log("response", response);
   };
 
   const signIn = async () => {
