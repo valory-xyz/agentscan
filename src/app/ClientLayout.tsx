@@ -125,7 +125,7 @@ export default function ClientLayout({
           <a
             href="https://olas.network"
             target="_blank"
-            className="absolute right-14 bottom-4"
+            className="absolute right-14 bottom-4 top-2"
             onClick={() => {
               logEvent("external_link_clicked", {
                 url: "https://olas.network",
