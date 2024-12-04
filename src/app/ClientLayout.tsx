@@ -99,7 +99,7 @@ export default function ClientLayout({
       >
         <Header />
 
-        <main className="flex-1 mt-20 flex flex-col">{children}</main>
+        <main className="flex-1 flex flex-col">{children}</main>
 
         <footer className="w-full py-2 md:py-4 bg-muted/50 mt-auto fixed bottom-0">
           <div className="container mx-auto px-2 md:px-4 relative">

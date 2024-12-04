@@ -264,6 +264,11 @@ export default function Home() {
         teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
       });
     }
+    setShowOnboarding(false);
+    localStorage.setItem("hasSeenOnboarding", "true");
+    logEvent("chat_started", {
+      teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+    });
   };
 
   const [showOnboarding, setShowOnboarding] = useState(true);
@@ -298,38 +303,11 @@ export default function Home() {
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
 
-  if (showOnboarding) {
-    return (
-      <div className="bg-white flex flex-col min-h-[calc(100vh-200px)]">
-        <motion.div
-          initial={{ opacity: 0 }}
-          animate={{ opacity: 1 }}
-          transition={{
-            duration: 0.5,
-            ease: "easeInOut",
-          }}
-        >
-          <main className="flex-grow w-full container mx-auto px-2 md:px-4 py-2 max-w-6xl flex flex-col justify-center h-[85vh] md:h-[70vh]">
-            <Onboarding
-              onStartChat={() => {
-                setShowOnboarding(false);
-                localStorage.setItem("hasSeenOnboarding", "true");
-                logEvent("chat_started", {
-                  teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-                });
-              }}
-            />
-          </main>
-        </motion.div>
-      </div>
-    );
-  }
-
   return (
     <div className="bg-white flex flex-col min-h-screen">
-      {showLanding ? (
+      {showLanding || showOnboarding ? (
         <motion.main
-          className="flex-1 flex items-center justify-center px-4"
+          className="flex flex-col h-screen items-center justify-center px-4"
           initial={{ opacity: 0 }}
           animate={{ opacity: 1 }}
           transition={{
