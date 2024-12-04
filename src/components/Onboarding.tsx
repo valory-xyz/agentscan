@@ -1,7 +1,6 @@
 import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Send } from "lucide-react";
-import { logEvent } from "@/lib/amplitude";
 
 interface OnboardingProps {
   onStartChat: () => void;
