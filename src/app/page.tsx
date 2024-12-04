@@ -304,7 +304,7 @@ export default function Home() {
   }, []);
 
   return (
-    <div className="bg-white flex flex-col min-h-screen">
+    <div className="bg-white flex flex-col min-h-screen justify-center">
       {showLanding || showOnboarding ? (
         <motion.main
           className="flex flex-col h-screen items-center justify-center px-4"
@@ -519,9 +519,7 @@ export default function Home() {
                 variant="outline"
                 className="w-full md:w-auto text-white bg-purple-600 hover:bg-white hover:text-black"
                 onClick={() => {
-                  setExternalUrl(
-                    "https://operate.olas.network/agents"
-                  );
+                  setExternalUrl("https://operate.olas.network/agents");
                 }}
               >
                 Launch your agent
