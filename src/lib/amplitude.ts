@@ -18,12 +18,10 @@ export const setUserId = (userId: string | null) => {
 
   if (userId) {
     amplitude.setUserId(userId);
-    amplitude.identify(
-      new amplitude.Identify().set("anonymousId", anonymousId)
-    );
   } else {
     amplitude.setUserId(anonymousId);
   }
+  amplitude.identify(new amplitude.Identify().set("anonymousId", anonymousId));
 };
 
 export const logEvent = (
