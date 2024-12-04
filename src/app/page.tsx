@@ -531,10 +531,10 @@ export default function Home() {
                 variant="outline"
                 className="w-full md:w-auto bg-black text-white hover:bg-white"
                 onClick={() => {
-                  setExternalUrl("https://docs.autonolas.network");
+                  setExternalUrl("https://olas.network/learn");
                 }}
               >
-                Documentation
+                Learn more
                 <ExternalLink className="ml-2 h-4 w-4" />
               </Button>
             </div>
