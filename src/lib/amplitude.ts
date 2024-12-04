@@ -2,7 +2,7 @@ import * as amplitude from "@amplitude/analytics-browser";
 
 import { v4 as uuidv4 } from "uuid";
 
-const USER_ID_KEY = "agentscan_user_id";
+const ANONYMOUS_ID_KEY = "agentscan_anonymous_id";
 
 export const initAmplitude = () => {
   amplitude.init(process.env.NEXT_PUBLIC_AMPLITUDE_API_KEY as string);
@@ -10,17 +10,19 @@ export const initAmplitude = () => {
 };
 
 export const setUserId = (userId: string | null) => {
+  const anonymousId = localStorage.getItem(ANONYMOUS_ID_KEY) || uuidv4();
+
+  if (!anonymousId) {
+    localStorage.setItem(ANONYMOUS_ID_KEY, anonymousId);
+  }
+
   if (userId) {
     amplitude.setUserId(userId);
+    amplitude.identify(
+      new amplitude.Identify().set("anonymousId", anonymousId)
+    );
   } else {
-    const existingUserId = localStorage.getItem(USER_ID_KEY);
-    if (existingUserId) {
-      amplitude.setUserId(existingUserId);
-    } else {
-      const newUserId = uuidv4();
-      localStorage.setItem(USER_ID_KEY, newUserId);
-      amplitude.setUserId(newUserId);
-    }
+    amplitude.setUserId(anonymousId);
   }
 };
 
