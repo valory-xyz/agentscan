@@ -294,14 +294,25 @@ export default function Home() {
 
   if (!showChat) {
     return (
-      <Onboarding
-        onStartChat={() => {
-          setShowChat(true);
-          logEvent("chat_started", {
-            teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-          });
-        }}
-      />
+      <div className="bg-white flex flex-col min-h-[calc(100vh-200px)]">
+        <motion.div
+          initial={{ opacity: 0 }}
+          animate={{ opacity: 1 }}
+          transition={{
+            duration: 0.5,
+            ease: "easeInOut",
+          }}
+        >
+          <main className="flex-grow w-full container mx-auto px-2 md:px-4 py-2 max-w-6xl flex flex-col justify-center h-[85vh] md:h-[70vh]">
+            <Onboarding onStartChat={() => {
+              setShowChat(true);
+              logEvent("chat_started", {
+                teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+              });
+            }} />
+          </main>
+        </motion.div>
+      </div>
     );
   }
 

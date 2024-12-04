@@ -8,7 +8,7 @@ interface OnboardingProps {
 
 export default function Onboarding({ onStartChat }: OnboardingProps) {
   return (
-    <div className="flex flex-col justify-center items-center text-center gap-8">
+    <div className="flex flex-col justify-center items-center text-center gap-8 h-full">
       <motion.div
         initial={{ opacity: 0, y: 20 }}
         animate={{ opacity: 1, y: 0 }}
