@@ -335,7 +335,7 @@ export default function Home() {
         >
           {/* Chat interface */}
           <main className="flex-grow w-full container mx-auto px-2 md:px-4 py-2 max-w-6xl flex flex-col justify-center">
-            <Card className="w-full max-w-full mx-auto h-[85vh] md:h-[70vh] flex flex-col">
+            <Card className="w-full max-w-full mx-auto h-[75vh] md:h-[85vh] md:h-[70vh] flex flex-col">
               <div className="p-2 border-b flex justify-end">
                 <Button
                   variant="ghost"
