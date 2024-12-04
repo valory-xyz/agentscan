@@ -57,6 +57,8 @@ export default function Home() {
     "Give me content I can look at to learn more about OLAS",
   ];
 
+  const mobileExampleQuestions = exampleQuestions.slice(0, 3);
+
   const [externalUrl, setExternalUrl] = useState<string | null>(null);
 
   const cleanUrl = (url: string) => url.replace(/\/+$/, "");
@@ -283,6 +285,19 @@ export default function Home() {
     await sendMessage(query, newMessages);
   };
 
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
+
   if (showOnboarding) {
     return (
       <div className="bg-white flex flex-col min-h-[calc(100vh-200px)]">
@@ -311,7 +326,7 @@ export default function Home() {
   }
 
   return (
-    <div className="bg-white flex flex-col min-h-[calc(100vh-200px)]">
+    <div className="bg-white flex flex-col min-h-screen">
       {showLanding ? (
         <motion.main
           className="flex-1 flex items-center justify-center px-4"
@@ -333,9 +348,8 @@ export default function Home() {
             ease: "easeInOut",
           }}
         >
-          {/* Chat interface */}
-          <main className="flex-grow w-full container mx-auto px-2 md:px-4 py-2 max-w-6xl flex flex-col justify-center">
-            <Card className="w-full max-w-full mx-auto h-[75vh] md:h-[85vh] md:h-[70vh] flex flex-col">
+          <main className="flex-grow w-full h-full mx-auto px-2 md:px-4 py-2 max-w-6xl flex flex-col justify-center">
+            <Card className="w-full mx-auto h-[70vh] flex flex-col">
               <div className="p-2 border-b flex justify-end">
                 <Button
                   variant="ghost"
@@ -499,18 +513,20 @@ export default function Home() {
                   </form>
 
                   <div className="flex flex-wrap gap-1 md:gap-2 justify-center mb-2 shrink-0">
-                    {exampleQuestions.map((question, index) => {
-                      return (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          onClick={() => handleQuestionClick(question)}
-                          className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
-                        >
-                          {getEmoji(question)} {question}
-                        </Button>
-                      );
-                    })}
+                    {(isMobile ? mobileExampleQuestions : exampleQuestions).map(
+                      (question, index) => {
+                        return (
+                          <Button
+                            key={index}
+                            variant="outline"
+                            onClick={() => handleQuestionClick(question)}
+                            className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
+                          >
+                            {getEmoji(question)} {question}
+                          </Button>
+                        );
+                      }
+                    )}
                   </div>
 
                   <p className="text-sm text-muted-foreground text-center shrink-0">
