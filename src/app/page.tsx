@@ -294,7 +294,6 @@ export default function Home() {
 
   useEffect(() => {
     const checkMobile = () => {
-      console.log("checking mobile");
       setIsMobile(window.innerWidth < 768);
     };
 
