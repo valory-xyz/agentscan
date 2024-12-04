@@ -528,7 +528,8 @@ export default function Home() {
 
             <div className="flex flex-col md:flex-row justify-center space-y-2 md:space-y-0 md:space-x-4 mt-4 md:mt-8 max-w-3xl mx-auto px-2">
               <Button
-                className="w-full md:w-auto"
+                variant="outline"
+                className="w-full md:w-auto text-white bg-purple-600 hover:bg-white hover:text-black"
                 onClick={() => {
                   setExternalUrl(
                     "https://docs.autonolas.network/open-autonomy/guides/quick_start"
@@ -540,7 +541,7 @@ export default function Home() {
               </Button>
               <Button
                 variant="outline"
-                className="w-full md:w-auto bg-purple-600 text-white hover:bg-purple-700"
+                className="w-full md:w-auto bg-black text-white hover:bg-white"
                 onClick={() => {
                   setExternalUrl("https://docs.autonolas.network");
                 }}
