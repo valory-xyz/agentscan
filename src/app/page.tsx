@@ -210,24 +210,18 @@ export default function Home() {
     }
   };
 
-  const handleSubmit = async (e: React.FormEvent) => {
-    e.preventDefault();
-    if (!query.trim() || isLoading || isStreaming) return;
+  const handleQuestionClick = async (question: string) => {
+    if (isLoading || isStreaming) return;
 
-    const userMessage = { role: "user", content: query };
+    // Set query and wait for state update
+    setQuery(question);
+
+    // Use the question directly instead of relying on query state
+    const userMessage = { role: "user", content: question };
     setMessages((prev) => [...prev, userMessage]);
     setQuery("");
     const newMessages = [...messages, userMessage];
-    await sendMessage(query, newMessages);
-  };
-
-  const handleQuestionClick = (question: string) => {
-    if (isLoading || isStreaming) return;
-
-    setQuery(question);
-
-    const syntheticEvent = { preventDefault: () => {} } as React.FormEvent;
-    handleSubmit(syntheticEvent);
+    await sendMessage(question, newMessages);
   };
 
   const getEmoji = (q: string) => {
@@ -247,19 +241,6 @@ export default function Home() {
       default:
         return "❓";
     }
-  };
-
-  const getLastConversationContext = () => {
-    const lastUserMessage = [...messages]
-      .reverse()
-      .find((m) => m.role === "user");
-    const lastAssistantMessage = [...messages]
-      .reverse()
-      .find((m) => m.role === "assistant");
-    return {
-      lastQuestion: lastUserMessage?.content || "",
-      lastResponse: lastAssistantMessage?.content || "",
-    };
   };
 
   const [showLanding, setShowLanding] = useState(true);
@@ -290,6 +271,17 @@ export default function Home() {
       localStorage.getItem("hasSeenOnboarding") === "true";
     setShowOnboarding(!hasSeenOnboarding);
   }, []);
+
+  const handleSubmit = async (e: React.FormEvent) => {
+    e.preventDefault();
+    if (!query.trim() || isLoading || isStreaming) return;
+
+    const userMessage = { role: "user", content: query };
+    setMessages((prev) => [...prev, userMessage]);
+    setQuery("");
+    const newMessages = [...messages, userMessage];
+    await sendMessage(query, newMessages);
+  };
 
   if (showOnboarding) {
     return (
