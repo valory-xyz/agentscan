@@ -290,9 +290,15 @@ export default function Home() {
     }
   };
 
-  const [showChat, setShowChat] = useState(false);
+  const [showOnboarding, setShowOnboarding] = useState(true);
 
-  if (!showChat) {
+  useEffect(() => {
+    const hasSeenOnboarding =
+      localStorage.getItem("hasSeenOnboarding") === "true";
+    setShowOnboarding(!hasSeenOnboarding);
+  }, []);
+
+  if (showOnboarding) {
     return (
       <div className="bg-white flex flex-col min-h-[calc(100vh-200px)]">
         <motion.div
@@ -306,7 +312,8 @@ export default function Home() {
           <main className="flex-grow w-full container mx-auto px-2 md:px-4 py-2 max-w-6xl flex flex-col justify-center h-[85vh] md:h-[70vh]">
             <Onboarding
               onStartChat={() => {
-                setShowChat(true);
+                setShowOnboarding(false);
+                localStorage.setItem("hasSeenOnboarding", "true");
                 logEvent("chat_started", {
                   teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
                 });
