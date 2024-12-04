@@ -33,11 +33,6 @@ function Header() {
             variant="ghost"
             className="text-white hover:text-black bg-purple-600 transition-colors text-sm md:text-base px-2 md:px-4"
             onClick={() => {
-              logEvent("external_link_clicked", {
-                url: "https://t.me/ExploreSupport",
-                context: "feedback_link",
-                teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-              });
               window.open("https://t.me/ExploreSupport", "_blank");
             }}
           >
