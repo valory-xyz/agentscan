@@ -30,8 +30,10 @@ import { Toaster } from "@/components/ui/toaster";
 import { getUserId, logEvent } from "../lib/amplitude";
 import ExternalLinkDialog from "@/components/ExternalLinkDialog";
 import Onboarding from "@/components/Onboarding";
+import { useAuth } from "@/hooks/use-auth";
 
 export default function Home() {
+  const { isAuthenticated, login, getAccessToken } = useAuth();
   const messagesContainerRef = useRef<HTMLDivElement>(null);
   const [userScrolled, setUserScrolled] = useState(false);
 
@@ -96,22 +98,27 @@ export default function Home() {
 
   const { toast } = useToast();
 
+  const [questionCount, setQuestionCount] = useState(0);
+  const [showAuthDialog, setShowAuthDialog] = useState(false);
+
   const sendMessage = async (question: string, currentMessages: any[]) => {
     setIsLoading(true);
     setIsStreaming(true);
 
     try {
+      const accessToken = await getAccessToken();
+
       const response = await fetch(
         `${process.env.NEXT_PUBLIC_API_URL}/conversation`,
         {
           method: "POST",
           headers: {
             "Content-Type": "application/json",
+            Authorization: `Bearer ${accessToken}`,
           },
           body: JSON.stringify({
             question,
             messages: currentMessages,
-            userId: getUserId(),
             teamId: process.env.NEXT_PUBLIC_TEAM_ID,
           }),
         }
@@ -119,6 +126,18 @@ export default function Home() {
 
       if (response.status === 429) {
         const data = await response.json();
+        //check if data.error is "You have reached the maximum number of free requests. Please sign in to continue using the service."
+
+        if (
+          data.error ===
+          "You have reached the maximum number of free requests. Please sign in to continue using the service."
+        ) {
+          setShowAuthDialog(true);
+          setMessages((prev) => prev.slice(0, -1));
+          setIsLoading(false);
+          setIsStreaming(false);
+          return;
+        }
         toast({
           variant: "destructive",
           title: data.message || "Please try again later",
@@ -275,13 +294,13 @@ export default function Home() {
 
   if (!showChat) {
     return (
-      <Onboarding 
+      <Onboarding
         onStartChat={() => {
           setShowChat(true);
           logEvent("chat_started", {
             teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
           });
-        }} 
+        }}
       />
     );
   }
@@ -534,6 +553,28 @@ export default function Home() {
           setExternalUrl(null);
         }}
       />
+      <AlertDialog open={showAuthDialog} onOpenChange={setShowAuthDialog}>
+        <AlertDialogContent>
+          <AlertDialogHeader>
+            <AlertDialogTitle>Sign in Required</AlertDialogTitle>
+            <AlertDialogDescription>
+              Please sign in to continue using agentscan. Signing in helps us
+              provide a better experience and prevent abuse.
+            </AlertDialogDescription>
+          </AlertDialogHeader>
+          <AlertDialogFooter>
+            <AlertDialogCancel>Cancel</AlertDialogCancel>
+            <AlertDialogAction
+              onClick={() => {
+                login();
+                setShowAuthDialog(false);
+              }}
+            >
+              Sign In
+            </AlertDialogAction>
+          </AlertDialogFooter>
+        </AlertDialogContent>
+      </AlertDialog>
       <Toaster />
     </div>
   );
