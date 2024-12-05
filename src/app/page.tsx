@@ -214,6 +214,16 @@ export default function Home() {
           }
         } catch (e) {}
       }
+
+      try {
+        logEvent("conversation_completed", {
+          teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+          question: question,
+          answer: fullContent,
+        });
+      } catch (error) {
+        console.error("Error logging completion event:", error);
+      }
     } catch (error: any) {
       console.log("Error:", error);
       toast({
