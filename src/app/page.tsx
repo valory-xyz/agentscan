@@ -215,6 +215,12 @@ export default function Home() {
   const handleQuestionClick = async (question: string) => {
     if (isLoading || isStreaming) return;
 
+    // Log when user clicks an example question
+    logEvent("example_question_clicked", {
+      teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+      question: question,
+    });
+
     // Set query and wait for state update
     setQuery(question);
 
@@ -302,6 +308,16 @@ export default function Home() {
 
     return () => window.removeEventListener("resize", checkMobile);
   }, []);
+
+  const handleInputChange = (e: React.ChangeEvent<HTMLInputElement>) => {
+    setQuery(e.target.value);
+    // Log when user starts typing a new question
+    if (e.target.value && query === "") {
+      logEvent("question_typing_started", {
+        teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+      });
+    }
+  };
 
   return (
     <div className="bg-white flex flex-col min-h-screen justify-center">
@@ -474,7 +490,7 @@ export default function Home() {
                   >
                     <Input
                       value={query}
-                      onChange={(e) => setQuery(e.target.value)}
+                      onChange={handleInputChange}
                       placeholder="Ask Andy Anything..."
                       className="w-full h-12 md:h-14 pl-3 md:pl-5 pr-12 md:pr-14 text-sm md:text-base"
                       disabled={isLoading || isStreaming}
