@@ -93,7 +93,6 @@ export default function Home() {
 
   const { toast } = useToast();
 
-  const [questionCount, setQuestionCount] = useState(0);
   const [showAuthDialog, setShowAuthDialog] = useState(false);
 
   const sendMessage = async (question: string, currentMessages: any[]) => {
@@ -138,6 +137,16 @@ export default function Home() {
         });
         setMessages((prev) => prev.slice(0, -1));
         return;
+      }
+
+      try {
+        logEvent("conversation_made", {
+          teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+          question: question,
+          messages: currentMessages,
+        });
+      } catch (error) {
+        console.error("Error logging event:", error);
       }
 
       if (!response.ok) throw new Error("Network response was not ok");

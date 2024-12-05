@@ -22,9 +22,11 @@ export const setUserId = (userId: string | null) => {
   amplitude.identify(new amplitude.Identify().set("anonymousId", anonymousId));
 };
 
-export const logEvent = (
+export const logEvent = async (
   eventName: string,
-  eventProperties?: Record<string, string>
+  eventProperties?: Record<string, any>
 ) => {
-  amplitude.track(eventName, eventProperties);
+  try {
+    amplitude.track(eventName, eventProperties);
+  } catch (error) {}
 };
