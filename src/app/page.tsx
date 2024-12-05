@@ -5,7 +5,14 @@
 import React from "react";
 import { useState, useRef, useEffect } from "react";
 
-import { Send, Bot, ExternalLink, Loader2 } from "lucide-react";
+import {
+  Send,
+  Bot,
+  ExternalLink,
+  Loader2,
+  ChevronUp,
+  ChevronDown,
+} from "lucide-react";
 import ReactMarkdown from "react-markdown";
 import { motion } from "framer-motion";
 import { useRouter } from "next/navigation";
@@ -328,6 +335,8 @@ export default function Home() {
     }
   };
 
+  const [showExampleQuestions, setShowExampleQuestions] = useState(true);
+
   return (
     <div className="bg-white flex flex-col min-h-screen justify-center">
       {showLanding || showOnboarding ? (
@@ -515,20 +524,44 @@ export default function Home() {
                     </Button>
                   </form>
 
-                  <div className="flex flex-wrap gap-1 md:gap-2 justify-center mb-2 shrink-0">
-                    {(isMobile ? mobileExampleQuestions : exampleQuestions).map(
-                      (question, index) => {
-                        return (
-                          <Button
-                            key={index}
-                            variant="outline"
-                            onClick={() => handleQuestionClick(question)}
-                            className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
-                          >
-                            {getEmoji(question)} {question}
-                          </Button>
-                        );
+                  <div className="flex flex-col gap-2">
+                    <Button
+                      variant="ghost"
+                      size="sm"
+                      onClick={() =>
+                        setShowExampleQuestions(!showExampleQuestions)
                       }
+                      className="text-gray-500 hover:text-gray-700 mx-auto"
+                    >
+                      {showExampleQuestions ? (
+                        <>
+                          Hide examples <ChevronUp className="h-4 w-4 ml-2" />
+                        </>
+                      ) : (
+                        <>
+                          Show examples <ChevronDown className="h-4 w-4 ml-2" />
+                        </>
+                      )}
+                    </Button>
+
+                    {showExampleQuestions && (
+                      <div className="flex flex-wrap gap-1 md:gap-2 justify-center mb-2 shrink-0">
+                        {(isMobile
+                          ? mobileExampleQuestions
+                          : exampleQuestions
+                        ).map((question, index) => {
+                          return (
+                            <Button
+                              key={index}
+                              variant="outline"
+                              onClick={() => handleQuestionClick(question)}
+                              className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
+                            >
+                              {getEmoji(question)} {question}
+                            </Button>
+                          );
+                        })}
+                      </div>
                     )}
                   </div>
 
