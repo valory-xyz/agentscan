@@ -1,3 +1,4 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 import * as amplitude from "@amplitude/analytics-browser";
 
 import { v4 as uuidv4 } from "uuid";
@@ -28,5 +29,7 @@ export const logEvent = async (
 ) => {
   try {
     amplitude.track(eventName, eventProperties);
-  } catch (error) {}
+  } catch (error: any) {
+    console.error("Error logging event:", error);
+  }
 };
