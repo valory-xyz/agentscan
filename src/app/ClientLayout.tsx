@@ -109,7 +109,7 @@ export default function ClientLayout({
                   href="/disclaimer"
                   className="hover:text-purple-600 transition-colors"
                   onClick={() => {
-                    logEvent("internal_link_clicked", {
+                    logEvent("external_link_clicked", {
                       url: "/disclaimer",
                       context: "footer_disclaimer",
                       teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
