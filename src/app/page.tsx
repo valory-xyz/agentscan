@@ -150,6 +150,7 @@ export default function Home() {
         logEvent("conversation_made", {
           teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
           question: question,
+          source: "web",
           messages: currentMessages,
         });
       } catch (error) {
@@ -219,6 +220,7 @@ export default function Home() {
         logEvent("conversation_completed", {
           teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
           question: question,
+          source: "web",
           answer: fullContent,
         });
       } catch (error) {
