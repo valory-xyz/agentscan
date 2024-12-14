@@ -62,6 +62,17 @@ export default function DisclaimerPage() {
         </section>
 
         <section>
+          <h2 className="text-xl font-bold mb-2">Use of User Queries:</h2>
+          <p>
+            Explore Labs, Inc. reserves the right to use anonymized or aggregated user queries for marketing, 
+            promotional, or educational purposes, including sharing them on social media or other public platforms. 
+            No personally identifiable information will be disclosed in such cases unless explicitly authorized by 
+            the user. By using Agentscan, you consent to this use and acknowledge that any shared content will adhere 
+            to applicable laws and ethical standards.
+          </p>
+        </section>
+
+        <section>
           <h2 className="text-xl font-bold mb-2">User Responsibilities</h2>
           <ul className="list-disc pl-5 space-y-2">
             <li>Users must be of legal age and comply with all applicable laws.</li>
@@ -72,7 +83,7 @@ export default function DisclaimerPage() {
 
         <section>
           <p className="text-sm text-gray-600 mt-8">
-            This Disclaimer & Privacy Policy was last updated on December 3, 2024. Should you have any questions or 
+            This Disclaimer & Privacy Policy was last updated on December 13, 2024. Should you have any questions or 
             require further information, please contact Explore Labs, Inc. directly.
           </p>
         </section>
