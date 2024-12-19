@@ -9,10 +9,12 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { LogOut, LogIn } from "lucide-react";
+import { usePathname } from "next/navigation";
 
 // Create a separate header component to use hooks
 function Header() {
   const { isAuthenticated, login, logout, user } = useAuth();
+  const pathname = usePathname();
 
   useEffect(() => {
     setUserId(user?.id || null);
@@ -28,22 +30,33 @@ function Header() {
           </div>
         </Link>
 
-        <div className="flex items-center gap-2 md:gap-4">
-          <Button
-            variant="ghost"
-            className="text-white hover:text-black bg-purple-600 transition-colors text-sm md:text-base px-2 md:px-4"
-            onClick={() => {
-              window.open("https://t.me/ExploreSupport", "_blank");
-            }}
+        <div className="flex items-center space-x-6">
+          <Link
+            href="/transactions"
+            className={`flex items-center ${
+              pathname === "/transactions"
+                ? "text-purple-600 border-b-2 border-purple-600"
+                : "text-gray-600 hover:text-purple-600"
+            }`}
           >
-            <span className="hidden sm:inline">Give</span> Feedback
-          </Button>
+            Transactions
+          </Link>
+          <Link
+            href="/"
+            className={`flex items-center ${
+              pathname === "/"
+                ? "text-purple-600 border-b-2 border-purple-600"
+                : "text-gray-600 hover:text-purple-600"
+            }`}
+          >
+            Chat
+          </Link>
 
           {isAuthenticated ? (
             <Button
               variant="ghost"
               onClick={logout}
-              className="text-white hover:text-black bg-black transition-colors text-sm md:text-base px-2 md:px-4"
+              className="text-white hover:text-black bg-black transition-colors text-sm md:text-base h-auto flex items-center"
             >
               <span className="inline">Sign Out</span>
               <LogOut className="h-4 w-4 sm:ml-2" />
@@ -54,7 +67,7 @@ function Header() {
               onClick={() => {
                 login();
               }}
-              className="text-white hover:text-black bg-black transition-colors text-sm md:text-base px-2 md:px-4"
+              className="text-white hover:text-black bg-black transition-colors text-sm md:text-base h-auto flex items-center"
             >
               <span className="inline">Sign In</span>
               <LogIn className="h-4 w-4 sm:ml-2" />
@@ -102,39 +115,54 @@ export default function ClientLayout({
 
         <footer className="w-full py-2 md:py-4 bg-muted/50 mt-auto fixed bottom-0">
           <div className="container mx-auto px-2 md:px-4 relative">
-            <div className="flex flex-col items-center">
-              <p className="text-xs md:text-sm text-muted-foreground text-center">
-                Copyright Explore Labs, Inc 2024 •{" "}
-                <Link
-                  href="/disclaimer"
-                  className="hover:text-purple-600 transition-colors"
+            <div className="flex justify-between items-center">
+              <div className="flex items-center space-x-4">
+                <Button
+                  variant="ghost"
+                  className="text-white hover:text-black bg-purple-600 transition-colors text-sm md:text-base px-2 md:px-4"
                   onClick={() => {
-                    logEvent("external_link_clicked", {
-                      url: "/disclaimer",
-                      context: "footer_disclaimer",
-                      teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-                    });
+                    window.open("https://t.me/ExploreSupport", "_blank");
                   }}
                 >
-                  Disclaimer & Privacy Policy
-                </Link>
-              </p>
+                  <span className="hidden sm:inline">Give</span> Feedback
+                </Button>
+              </div>
+              
+              <div className="flex flex-col items-center">
+                <p className="text-xs md:text-sm text-muted-foreground text-center">
+                  Copyright Explore Labs, Inc 2024 •{" "}
+                  <Link
+                    href="/disclaimer"
+                    className="hover:text-purple-600 transition-colors"
+                    onClick={() => {
+                      logEvent("external_link_clicked", {
+                        url: "/disclaimer",
+                        context: "footer_disclaimer",
+                        teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+                      });
+                    }}
+                  >
+                    Disclaimer & Privacy Policy
+                  </Link>
+                </p>
+              </div>
+
+              <a
+                href="https://olas.network"
+                target="_blank"
+                className="flex items-center"
+                onClick={() => {
+                  logEvent("external_link_clicked", {
+                    url: "https://olas.network",
+                    context: "footer_link",
+                    teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+                  });
+                }}
+              >
+                <img src="/olas.svg" alt="Autonolas" className="h-6 md:h-9" />
+              </a>
             </div>
           </div>
-          <a
-            href="https://olas.network"
-            target="_blank"
-            className="absolute right-4 md:right-14 bottom-2 md:bottom-4 top-1 md:top-2"
-            onClick={() => {
-              logEvent("external_link_clicked", {
-                url: "https://olas.network",
-                context: "footer_link",
-                teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-              });
-            }}
-          >
-            <img src="/olas.svg" alt="Autonolas" className="h-6 md:h-9" />
-          </a>
         </footer>
       </body>
     </PrivyProvider>
