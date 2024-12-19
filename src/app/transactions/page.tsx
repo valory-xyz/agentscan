@@ -12,6 +12,7 @@ interface Transaction {
     agent: {
       name: string;
       description: string;
+      balance?: string;
     }
   };
   chain: string;
@@ -116,11 +117,11 @@ export default function TransactionsPage() {
 
       {/* Page Title */}
       <div className="mb-6">
-        <h1 className="text-2xl font-bold">Transactions</h1>
-        <p className="text-gray-500">Recent Autonolas agent transactions</p>
+        <h1 className="text-2xl font-bold">Recent Agents</h1>
+        <p className="text-gray-500">Latest active Autonolas agents</p>
       </div>
 
-      {/* Add Chain Filter */}
+      {/* Chain Filter */}
       <div className="mb-6">
         <select
           value={selectedChain}
@@ -134,65 +135,58 @@ export default function TransactionsPage() {
         </select>
       </div>
 
-      {/* Transactions Table */}
-      <div className="overflow-x-auto">
-        <table className="w-full">
-          <thead>
-            <tr className="border-b">
-              <th className="text-left py-3 px-4 font-medium text-gray-500">Hash</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-500">Agent</th>
-              <th className="text-left py-3 px-4 font-medium text-gray-500">Description</th>
-              <th className="text-right py-3 px-4 font-medium text-gray-500">Time</th>
-              <th className="text-center py-3 px-4 font-medium text-gray-500">Agent Link</th>
-            </tr>
-          </thead>
-          <tbody>
-            {transactions.map((tx, index) => (
-              <tr key={tx.transactionHash} className="border-b hover:bg-gray-50">
-                <td className="py-4 px-4">
-                  <div className="flex items-center">
-                    <a href={tx.link} target="_blank" rel="noopener noreferrer" className="text-blue-600 hover:underline">
-                      {tx.transactionHash.slice(0, 6)}...{tx.transactionHash.slice(-4)}
-                    </a>
-                    <svg
-                      className="w-4 h-4 ml-2 cursor-pointer"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
-                    >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
-                  </div>
-                </td>
-                <td className="py-4 px-4">{tx.agentInstance.agent.name}</td>
-                <td className="py-4 px-4">{tx.agentInstance.agent.description}</td>
-                <td className="py-4 px-4 text-right text-gray-500">
-                  {getRelativeTime(tx.timestamp)}
-                </td>
-                <td className="py-4 px-4 text-center">
-                  <Link href={`/agent/${tx.agentInstance.id}`}>
-                    <button className="bg-white text-purple-600 px-4 py-2 rounded hover:bg-purple-100 transition-colors">
-                      Learn More
-                    </button>
-                  </Link>
-                </td>
-              </tr>
-            ))}
-          </tbody>
-        </table>
+      {/* Agent Cards Grid */}
+      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
+        {transactions.slice(0, 10).map((tx) => (
+          <div
+            key={tx.transactionHash}
+            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
+          >
+            {/* Agent Name */}
+            <h3 className="text-lg font-semibold mb-2 truncate">
+              {tx.agentInstance.agent.name}
+            </h3>
+
+            {/* Agent Type/Description */}
+            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+              {tx.agentInstance.agent.description}
+            </p>
+
+            {/* Balance - Note: You'll need to add this data from your API */}
+            <div className="flex items-center justify-between text-sm">
+              <span className="text-gray-500">Balance:</span>
+              <span className="font-medium">
+                {tx.agentInstance.agent.balance || '0.00 ETH'}
+              </span>
+            </div>
+
+            {/* Last Active */}
+            <div className="flex items-center justify-between text-sm mt-2">
+              <span className="text-gray-500">Last Active:</span>
+              <span className="text-gray-600">
+                {getRelativeTime(tx.timestamp)}
+              </span>
+            </div>
+
+            {/* Learn More Button */}
+            <Link 
+              href={`/agent/${tx.agentInstance.id}`}
+              className="mt-4 block w-full"
+            >
+              <button className="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors">
+                View Agent
+              </button>
+            </Link>
+          </div>
+        ))}
       </div>
 
-      {/* Add this after the table */}
+      {/* Loading indicator */}
       <div 
         ref={observerTarget}
-        className="w-full h-10 flex items-center justify-center"
+        className="w-full h-10 flex items-center justify-center mt-4"
       >
-        {loading && <div className="text-gray-500">Loading more transactions...</div>}
+        {loading && <div className="text-gray-500">Loading more agents...</div>}
       </div>
     </div>
   );
