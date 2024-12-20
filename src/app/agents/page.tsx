@@ -145,7 +145,7 @@ export default function TransactionsPage() {
 
             {/* Last Active */}
             <div className="flex items-center justify-between text-sm mt-2">
-              <span className="text-gray-500">Last Active:</span>
+              <span className="text-gray-500">Created:</span>
               <span className="text-gray-600">
                 {getRelativeTime(tx.timestamp)}
               </span>

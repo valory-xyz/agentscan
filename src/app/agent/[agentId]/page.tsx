@@ -1,6 +1,19 @@
 "use client";
 import { useState, useEffect, use } from "react";
 
+const getRelativeTime = (timestamp: number) => {
+  const now = Date.now();
+  const diff = now - timestamp * 1000;
+  const minutes = Math.floor(diff / 60000);
+  const hours = Math.floor(minutes / 60);
+  const days = Math.floor(hours / 24);
+
+  if (days > 0) return `${days}d ago`;
+  if (hours > 0) return `${hours}h ago`;
+  if (minutes > 0) return `${minutes}m ago`;
+  return "just now";
+};
+
 interface Instance {
   id: string;
   timestamp: number;
@@ -112,8 +125,7 @@ export default function AgentPage({
           </div>
           <div>
             <p className="text-gray-500">
-              Last active{" "}
-              {new Date(instance.timestamp * 1000).toLocaleDateString()}
+              Created {getRelativeTime(instance.timestamp)}
             </p>
           </div>
         </div>
@@ -143,7 +155,6 @@ export default function AgentPage({
         <div className="col-span-3">
           <div className="border rounded-lg p-6">
             <h2 className="text-xl font-bold mb-4">Agent Activity</h2>
-            <p className="text-gray-600 mb-6">Instance ID: {instance?.id}</p>
 
             {/* Transactions List */}
             <div className="space-y-4">
@@ -171,7 +182,7 @@ export default function AgentPage({
                     </div>
                     <div className="text-right">
                       <p className="text-sm text-gray-500">
-                        {new Date(tx.timestamp * 1000).toLocaleDateString()}
+                        {getRelativeTime(tx.timestamp)}
                       </p>
                     </div>
                   </div>
