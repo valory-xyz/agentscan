@@ -43,12 +43,9 @@ export default function TransactionsPage() {
       if (currentIds.length > 0) {
         url.searchParams.append("excludedIds", currentIds.join(","));
       }
-      console.log(currentIds);
-      console.log(url.toString());
 
       const response = await fetch(url.toString());
       const data: TransactionsResponse = await response.json();
-      console.log(data);
 
       if (data.transactions.length > 0) {
         setTransactions((prev) => [...prev, ...data.transactions]);
@@ -122,10 +119,11 @@ export default function TransactionsPage() {
         </h1>
 
         <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
-          {transactions.map((tx) => (
-            <div
-              key={tx.id}
-              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100"
+          {transactions.map((tx, index) => (
+            <Link
+              key={index}
+              href={`/agent/${tx.id}`}
+              className="block bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100"
             >
               {/* Image Container */}
               <div className="relative h-48 overflow-hidden">
@@ -146,18 +144,11 @@ export default function TransactionsPage() {
                 <h3 className="text-xl font-semibold mb-2 text-gray-800">
                   {tx.agent.name}
                 </h3>
-                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                <p className="text-gray-600 text-sm line-clamp-2">
                   {tx.agent.description}
                 </p>
-
-                <Link
-                  href={`/agent/${tx.id}`}
-                  className="block w-full text-center bg-purple-600 text-white px-4 py-2.5 rounded-lg hover:bg-purple-700 transition-colors duration-300 font-medium"
-                >
-                  View Details
-                </Link>
               </div>
-            </div>
+            </Link>
           ))}
         </div>
 

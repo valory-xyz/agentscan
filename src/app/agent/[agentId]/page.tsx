@@ -148,7 +148,21 @@ export default function AgentPage({
   };
 
   if (loading) {
-    return <div className="container mx-auto px-4 pt-20">Loading...</div>;
+    return (
+      <div className="flex items-center justify-center h-full w-full flex-1">
+        <div className="flex items-center space-x-2 text-purple-600">
+          <div className="w-2 h-2 rounded-full animate-bounce bg-purple-600"></div>
+          <div
+            className="w-2 h-2 rounded-full animate-bounce bg-purple-600"
+            style={{ animationDelay: "0.2s" }}
+          ></div>
+          <div
+            className="w-2 h-2 rounded-full animate-bounce bg-purple-600"
+            style={{ animationDelay: "0.4s" }}
+          ></div>
+        </div>
+      </div>
+    );
   }
 
   if (!instance) {
