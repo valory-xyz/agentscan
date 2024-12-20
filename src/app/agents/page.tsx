@@ -1,3 +1,4 @@
+/* eslint-disable @next/next/no-img-element */
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
@@ -38,17 +39,19 @@ export default function TransactionsPage() {
         url.searchParams.append("cursor", cursor);
       }
 
+      const currentIds = transactions.map((t) => t.id);
+      if (currentIds.length > 0) {
+        url.searchParams.append("excludedIds", currentIds.join(","));
+      }
+      console.log(currentIds);
+      console.log(url.toString());
+
       const response = await fetch(url.toString());
       const data: TransactionsResponse = await response.json();
+      console.log(data);
 
       if (data.transactions.length > 0) {
-        setTransactions((prev) => {
-          const existingIds = new Set(prev.map((t) => t.id));
-          const newTransactions = data.transactions.filter(
-            (t) => !existingIds.has(t.id)
-          );
-          return [...prev, ...newTransactions];
-        });
+        setTransactions((prev) => [...prev, ...data.transactions]);
       }
       setNextCursor(data.nextCursor);
     } catch (error) {
@@ -112,61 +115,71 @@ export default function TransactionsPage() {
   };
 
   return (
-    <div className="container mx-auto px-4 pt-20">
-      {/* Page Title */}
-      <div className="mb-6">
-        <h1 className="text-2xl font-bold">Recent Agents</h1>
-        <p className="text-gray-500">Latest active Autonolas agents</p>
-      </div>
+    <div className="">
+      <div className="container mx-auto px-8 py-16">
+        <h1 className="text-3xl font-semibold text-gray-900 mb-8">
+          Recently Active Agents
+        </h1>
 
-      {/* Agent Cards Grid */}
-      <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-5 gap-4">
-        {transactions.map((tx) => (
-          <div
-            key={tx.id}
-            className="bg-white rounded-lg shadow-md p-6 hover:shadow-lg transition-shadow"
-          >
-            {/* Agent Image */}
-            <img
-              src={tx.agent.image}
-              alt={tx.agent.name}
-              className="w-full h-48 object-cover rounded-md mb-4"
-            />
+        <div className="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 xl:grid-cols-4 gap-8">
+          {transactions.map((tx) => (
+            <div
+              key={tx.id}
+              className="bg-white rounded-xl shadow-sm hover:shadow-md transition-all duration-300 overflow-hidden border border-gray-100"
+            >
+              {/* Image Container */}
+              <div className="relative h-48 overflow-hidden">
+                <img
+                  src={tx.agent.image}
+                  alt={tx.agent.name}
+                  className="w-full h-full object-cover transform hover:scale-105 transition-transform duration-300"
+                />
+                <div className="absolute bottom-0 left-0 right-0 bg-gradient-to-t from-black/60 to-transparent p-4">
+                  <span className="text-white text-sm">
+                    Active {getRelativeTime(tx.timestamp)}
+                  </span>
+                </div>
+              </div>
 
-            {/* Agent Name */}
-            <h3 className="text-lg font-semibold mb-2 truncate">
-              {tx.agent.name}
-            </h3>
+              {/* Content Container */}
+              <div className="p-6">
+                <h3 className="text-xl font-semibold mb-2 text-gray-800">
+                  {tx.agent.name}
+                </h3>
+                <p className="text-gray-600 text-sm mb-4 line-clamp-2">
+                  {tx.agent.description}
+                </p>
 
-            {/* Agent Description */}
-            <p className="text-gray-600 text-sm mb-4 line-clamp-2">
-              {tx.agent.description}
-            </p>
-
-            {/* Last Active */}
-            <div className="flex items-center justify-between text-sm mt-2">
-              <span className="text-gray-500">Created:</span>
-              <span className="text-gray-600">
-                {getRelativeTime(tx.timestamp)}
-              </span>
+                <Link
+                  href={`/agent/${tx.id}`}
+                  className="block w-full text-center bg-purple-600 text-white px-4 py-2.5 rounded-lg hover:bg-purple-700 transition-colors duration-300 font-medium"
+                >
+                  View Details
+                </Link>
+              </div>
             </div>
+          ))}
+        </div>
 
-            {/* Learn More Button */}
-            <Link href={`/agent/${tx.id}`} className="mt-4 block w-full">
-              <button className="w-full bg-purple-600 text-white px-4 py-2 rounded hover:bg-purple-700 transition-colors">
-                View Agent
-              </button>
-            </Link>
-          </div>
-        ))}
-      </div>
-
-      {/* Loading indicator */}
-      <div
-        ref={observerTarget}
-        className="w-full h-10 flex items-center justify-center mt-4"
-      >
-        {loading && <div className="text-gray-500">Loading more agents...</div>}
+        {/* Loading Indicator */}
+        <div
+          ref={observerTarget}
+          className="w-full flex items-center justify-center mt-12"
+        >
+          {loading && (
+            <div className="flex items-center space-x-2 text-purple-600">
+              <div className="w-2 h-2 rounded-full animate-bounce bg-purple-600"></div>
+              <div
+                className="w-2 h-2 rounded-full animate-bounce bg-purple-600"
+                style={{ animationDelay: "0.2s" }}
+              ></div>
+              <div
+                className="w-2 h-2 rounded-full animate-bounce bg-purple-600"
+                style={{ animationDelay: "0.4s" }}
+              ></div>
+            </div>
+          )}
+        </div>
       </div>
     </div>
   );

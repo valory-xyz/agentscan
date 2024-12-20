@@ -1,5 +1,9 @@
 "use client";
 import { useState, useEffect, use } from "react";
+import ChatComponent from "@/components/ChatComponent";
+import { Button } from "@/components/ui/button";
+import { ChevronUp, ChevronDown } from "lucide-react";
+import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
 
 const getRelativeTime = (timestamp: number) => {
   const now = Date.now();
@@ -47,6 +51,11 @@ interface InstanceResponse {
   transactions: Transaction[];
 }
 
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export default function AgentPage({
   params,
 }: {
@@ -56,12 +65,35 @@ export default function AgentPage({
   const [instance, setInstance] = useState<Instance | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
+  const [messages, setMessages] = useState<Message[]>([]);
 
   const formatEthValue = (value: string) => {
     if (!value) return "0 ETH";
     const ethValue = parseInt(value) / 1e18;
     return `${ethValue} ETH`;
   };
+
+  const exampleQuestions = [
+    "What can this agent do?",
+    "Show me its recent transactions",
+    "How does it make decisions?",
+    "What's its trading strategy?",
+  ];
+
+  const mobileExampleQuestions = exampleQuestions.slice(0, 3);
+  const [showExampleQuestions, setShowExampleQuestions] = useState(true);
+  const [isMobile, setIsMobile] = useState(false);
+
+  useEffect(() => {
+    const checkMobile = () => {
+      setIsMobile(window.innerWidth < 768);
+    };
+
+    checkMobile();
+    window.addEventListener("resize", checkMobile);
+
+    return () => window.removeEventListener("resize", checkMobile);
+  }, []);
 
   useEffect(() => {
     const fetchInstance = async () => {
@@ -97,6 +129,24 @@ export default function AgentPage({
     fetchInstanceAndTransactions();
   }, [unwrappedParams.agentId]);
 
+  const sendMessage = async (message: string) => {
+    try {
+      // Add user message
+      const userMessage: Message = { role: "user", content: message };
+      setMessages((prev) => [...prev, userMessage]);
+
+      // TODO: Add API call here to get agent's response
+      // For now, simulate a response
+      const botMessage: Message = {
+        role: "assistant",
+        content: "I received your message: " + message,
+      };
+      setMessages((prev) => [...prev, botMessage]);
+    } catch (error) {
+      console.error("Error sending message:", error);
+    }
+  };
+
   if (loading) {
     return <div className="container mx-auto px-4 pt-20">Loading...</div>;
   }
@@ -106,58 +156,63 @@ export default function AgentPage({
   }
 
   return (
-    <div className="container mx-auto px-4 pt-20">
-      {/* Agent Header */}
-      <div className="mb-6 border-b pb-6">
-        <div className="flex items-center gap-4">
+    <div className="container mx-auto px-4 py-20 max-w-7xl">
+      {/* Agent Header with Details */}
+      <div className="mb-8 border-b border-gray-200 pb-8">
+        <div className="flex items-center gap-6">
           <img
             src={instance.agent.image}
             alt={instance.agent.name}
-            className="w-16 h-16 rounded-full object-cover"
+            className="w-20 h-20 rounded-full object-cover"
           />
-          <div className="flex-grow">
-            <h1 className="text-2xl font-bold">{instance.agent.name}</h1>
-            <div className="mt-2">
-              <span className="bg-purple-100 text-purple-600 px-3 py-1 rounded-full text-sm">
-                Trader
-              </span>
+          <div className="flex-grow space-y-2">
+            <h1 className="text-3xl font-bold">{instance.agent.name}</h1>
+            <div className="flex items-center gap-4">
+              <p className="text-gray-500 text-sm">
+                Created {getRelativeTime(instance.timestamp)}
+              </p>
+              <div className="">
+                <a
+                  href={instance.agent.codeUri}
+                  target="_blank"
+                  rel="noopener noreferrer"
+                  className="text-purple-600 text-sm hover:text-purple-700 font-medium hover:underline inline-flex items-center"
+                >
+                  View Code Repository
+                  <svg
+                    className="w-4 h-4 ml-1"
+                    fill="none"
+                    stroke="currentColor"
+                    viewBox="0 0 24 24"
+                  >
+                    <path
+                      strokeLinecap="round"
+                      strokeLinejoin="round"
+                      strokeWidth={2}
+                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                    />
+                  </svg>
+                </a>
+              </div>
             </div>
           </div>
-          <div>
-            <p className="text-gray-500">
-              Created {getRelativeTime(instance.timestamp)}
-            </p>
-          </div>
+        </div>
+
+        {/* Moved Agent Details here */}
+        <div className="mt-6">
+          <p className="text-gray-600 leading-relaxed">
+            {instance.agent.description}
+          </p>
         </div>
       </div>
 
-      {/* Main content area */}
-      <div className="grid grid-cols-4 gap-8">
-        {/* Left sidebar */}
-        <div className="col-span-1">
-          <div className="border rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-4">Agent Details</h2>
-            <p className="text-gray-600">{instance.agent.description}</p>
-            <div className="mt-4">
-              <a
-                href={instance.agent.codeUri}
-                target="_blank"
-                rel="noopener noreferrer"
-                className="text-purple-600 hover:underline"
-              >
-                View Code Repository
-              </a>
-            </div>
-          </div>
-        </div>
-
-        {/* Right content area */}
-        <div className="col-span-3">
-          <div className="border rounded-lg p-6">
-            <h2 className="text-xl font-bold mb-4">Agent Activity</h2>
-
-            {/* Transactions List */}
-            <div className="space-y-4">
+      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
+        {/* Left column - takes 3 columns on large screens */}
+        <div className="lg:col-span-3 space-y-8">
+          {/* Simplified Tabs - only showing Activity */}
+          <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+            <h2 className="text-xl font-semibold mb-6">Agent Activity</h2>
+            <div className="space-y-6 max-h-[800px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
               {transactions.map((tx) => (
                 <div
                   key={tx.transactionHash}
@@ -221,6 +276,63 @@ export default function AgentPage({
                 </p>
               )}
             </div>
+          </div>
+        </div>
+
+        {/* Right Column: Chat Component - takes 2 columns on large screens */}
+        <div className="lg:col-span-2">
+          <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm sticky top-8">
+            <ChatComponent
+              onSend={sendMessage}
+              messages={messages}
+              initialMessage={`Hi there! I'm ${instance?.agent.name}. Ask me anything about what I do!`}
+              placeholder="Ask this agent anything..."
+              onExternalLinkClick={(url) => window.open(url, "_blank")}
+            >
+              <div className="flex flex-col gap-2 mt-4">
+                <Button
+                  variant="ghost"
+                  size="sm"
+                  onClick={() => setShowExampleQuestions(!showExampleQuestions)}
+                  className="text-gray-500 hover:text-gray-700 mx-auto"
+                >
+                  {showExampleQuestions ? (
+                    <>
+                      Hide examples <ChevronUp className="h-4 w-4 ml-2" />
+                    </>
+                  ) : (
+                    <>
+                      Show examples <ChevronDown className="h-4 w-4 ml-2" />
+                    </>
+                  )}
+                </Button>
+
+                {showExampleQuestions && (
+                  <div className="flex flex-wrap gap-2 justify-center mb-2">
+                    {(isMobile ? mobileExampleQuestions : exampleQuestions).map(
+                      (question, index) => (
+                        <Button
+                          key={index}
+                          variant="outline"
+                          onClick={() => {
+                            // Handle question click
+                            // const userMessage = {
+                            //   role: "user",
+                            //   content: question,
+                            // };
+                            // setMessages((prev) => [...prev, userMessage]);
+                            // sendMessage(question, [...messages, userMessage]);
+                          }}
+                          className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
+                        >
+                          {question}
+                        </Button>
+                      )
+                    )}
+                  </div>
+                )}
+              </div>
+            </ChatComponent>
           </div>
         </div>
       </div>
