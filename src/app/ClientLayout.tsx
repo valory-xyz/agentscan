@@ -32,24 +32,14 @@ function Header() {
 
         <div className="flex items-center space-x-6">
           <Link
-            href="/transactions"
+            href="/agents"
             className={`flex items-center ${
-              pathname === "/transactions"
-                ? "text-purple-600 border-b-2 border-purple-600"
+              pathname === "/agents"
+                ? "text-purple-600 "
                 : "text-gray-600 hover:text-purple-600"
             }`}
           >
-            Transactions
-          </Link>
-          <Link
-            href="/"
-            className={`flex items-center ${
-              pathname === "/"
-                ? "text-purple-600 border-b-2 border-purple-600"
-                : "text-gray-600 hover:text-purple-600"
-            }`}
-          >
-            Chat
+            Agents
           </Link>
 
           {isAuthenticated ? (
@@ -101,19 +91,17 @@ export default function ClientLayout({
         loginMethods: ["email", "wallet"],
         appearance: {
           theme: "light",
-          accentColor: "#A855F7", // Purple to match your theme
+          accentColor: "#A855F7",
           showWalletLoginFirst: false,
         },
       }}
     >
-      <body
+      <div
         className={`${geistSansVariable} ${geistMonoVariable} min-h-screen flex flex-col`}
       >
         <Header />
-
         <main className="flex-1 flex flex-col">{children}</main>
-
-        <footer className="w-full py-2 md:py-4 bg-muted/50 mt-auto fixed bottom-0">
+        <footer className="w-full py-2 md:py-3 bg-muted/75 mt-auto fixed bottom-0">
           <div className="container mx-auto px-2 md:px-4 relative">
             <div className="flex justify-between items-center">
               <div className="flex items-center space-x-4">
@@ -127,7 +115,7 @@ export default function ClientLayout({
                   <span className="hidden sm:inline">Give</span> Feedback
                 </Button>
               </div>
-              
+
               <div className="flex flex-col items-center">
                 <p className="text-xs md:text-sm text-muted-foreground text-center">
                   Copyright Explore Labs, Inc 2024 •{" "}
@@ -164,7 +152,7 @@ export default function ClientLayout({
             </div>
           </div>
         </footer>
-      </body>
+      </div>
     </PrivyProvider>
   );
 }

@@ -82,12 +82,14 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
-      <ClientLayout
-        geistSansVariable={geistSans.variable}
-        geistMonoVariable={geistMono.variable}
-      >
-        {children}
-      </ClientLayout>
+      <body>
+        <ClientLayout
+          geistSansVariable={geistSans.variable}
+          geistMonoVariable={geistMono.variable}
+        >
+          {children}
+        </ClientLayout>
+      </body>
     </html>
   );
 }
