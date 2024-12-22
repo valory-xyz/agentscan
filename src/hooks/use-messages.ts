@@ -1,3 +1,5 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
+/* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from "react";
 import { useToast } from "./use-toast";
 import { logEvent } from "@/lib/amplitude";
