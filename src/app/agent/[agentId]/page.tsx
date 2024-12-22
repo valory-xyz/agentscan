@@ -20,6 +20,14 @@ const getRelativeTime = (timestamp: number) => {
   return "just now";
 };
 
+const getExplorerUrl = (chain: string, address: string) => {
+  const baseUrl =
+    chain === "gnosis"
+      ? "https://gnosisscan.io/address/"
+      : "https://etherscan.io/address/";
+  return `${baseUrl}${address}`;
+};
+
 interface Instance {
   id: string;
   timestamp: number;
@@ -139,70 +147,74 @@ export default function AgentPage({
   }
 
   return (
-    <div className="container mx-auto px-4 py-20 max-w-7xl">
-      {/* Back Button */}
-      <Link
-        href="/agents"
-        className="inline-flex items-center text-purple-600 hover:text-purple-700 mb-6"
-      >
-        <svg
-          className="w-5 h-5 mr-2"
-          fill="none"
-          stroke="currentColor"
-          viewBox="0 0 24 24"
-        >
-          <path
-            strokeLinecap="round"
-            strokeLinejoin="round"
-            strokeWidth={2}
-            d="M15 19l-7-7 7-7"
-          />
-        </svg>
-        Back to Agents
-      </Link>
-
+    <div className="container mx-auto px-4 py-16 max-w-7xl">
       {/* Agent Header with Details */}
-      <div className="mb-8 border-b border-gray-200 pb-8">
-        <div className="flex items-center gap-6">
-          <img
-            src={instance.agent.image}
-            alt={instance.agent.name}
-            className="w-20 h-20 rounded-full object-cover"
-          />
-          <div className="flex-grow space-y-2">
-            <h1 className="text-3xl font-bold">{instance.agent.name}</h1>
-            <div className="flex items-center gap-4">
-              <p className="text-gray-500 text-sm">
-                Created {getRelativeTime(instance.timestamp)}
-              </p>
-              <div className="">
-                <a
-                  href={instance.agent.codeUri}
-                  target="_blank"
-                  rel="noopener noreferrer"
-                  className="text-purple-600 text-sm hover:text-purple-700 font-medium hover:underline inline-flex items-center"
-                >
-                  View Code Repository
-                  <svg
-                    className="w-4 h-4 ml-1"
-                    fill="none"
-                    stroke="currentColor"
-                    viewBox="0 0 24 24"
+      <div className="mb-8 border-b border-gray-200 pb-4">
+        <div className="flex items-center justify-between mb-3">
+          <div className="flex items-center gap-6 flex-grow">
+            <img
+              src={instance.agent.image}
+              alt={instance.agent.name}
+              className="w-20 h-20 rounded-full object-cover"
+            />
+            <div className="flex-grow space-y-2">
+              <h1 className="text-3xl font-bold">{instance.agent.name}</h1>
+              <div className="flex items-center gap-4">
+                <p className="text-gray-500 text-sm">
+                  Created {getRelativeTime(instance.timestamp)}
+                </p>
+                <div className="">
+                  <a
+                    href={instance.agent.codeUri}
+                    onClick={(e) => {
+                      e.preventDefault();
+                      setExternalUrl(instance.agent.codeUri);
+                    }}
+                    className="text-purple-600 text-sm hover:text-purple-700 font-medium hover:underline inline-flex items-center"
                   >
-                    <path
-                      strokeLinecap="round"
-                      strokeLinejoin="round"
-                      strokeWidth={2}
-                      d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                    />
-                  </svg>
-                </a>
+                    View Code Repository
+                    <svg
+                      className="w-4 h-4 ml-1"
+                      fill="none"
+                      stroke="currentColor"
+                      viewBox="0 0 24 24"
+                    >
+                      <path
+                        strokeLinecap="round"
+                        strokeLinejoin="round"
+                        strokeWidth={2}
+                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                      />
+                    </svg>
+                  </a>
+                </div>
               </div>
             </div>
           </div>
+
+          {/* Back Button - Moved and aligned right */}
+          <Link
+            href="/agents"
+            className="inline-flex items-center text-purple-600 hover:text-purple-700"
+          >
+            <svg
+              className="w-5 h-5 mr-2"
+              fill="none"
+              stroke="currentColor"
+              viewBox="0 0 24 24"
+            >
+              <path
+                strokeLinecap="round"
+                strokeLinejoin="round"
+                strokeWidth={2}
+                d="M15 19l-7-7 7-7"
+              />
+            </svg>
+            Back to Agents
+          </Link>
         </div>
 
-        {/* Moved Agent Details here */}
+        {/* Agent Description */}
         <div className="mt-6">
           <p className="text-gray-600 leading-relaxed">
             {instance.agent.description}
@@ -210,13 +222,12 @@ export default function AgentPage({
         </div>
       </div>
 
-      <div className="grid grid-cols-1 lg:grid-cols-5 gap-8">
-        {/* Left column - takes 3 columns on large screens */}
-        <div className="lg:col-span-3 space-y-8">
-          {/* Simplified Tabs - only showing Activity */}
-          <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm">
+      <div className="flex flex-col lg:flex-row gap-8">
+        {/* Transactions section - Updated width */}
+        <div className="flex-1 space-y-8">
+          <div className="bg-white border border-gray-200 p-8 h-[800px] flex flex-col">
             <h2 className="text-xl font-semibold mb-6">Agent Activity</h2>
-            <div className="space-y-6 max-h-[800px] overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+            <div className="space-y-6 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
               {transactions.map((tx) => (
                 <div
                   key={tx.transactionHash}
@@ -228,10 +239,34 @@ export default function AgentPage({
                         {tx.chain.toUpperCase()}
                       </span>
                       <p className="text-sm text-gray-600">
-                        From: {tx.transaction.from}
+                        From:{" "}
+                        <a
+                          href={getExplorerUrl(tx.chain, tx.transaction.from)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setExternalUrl(
+                              getExplorerUrl(tx.chain, tx.transaction.from)
+                            );
+                          }}
+                          className="text-purple-600 hover:underline"
+                        >
+                          {tx.transaction.from}
+                        </a>
                       </p>
                       <p className="text-sm text-gray-600">
-                        To: {tx.transaction.to}
+                        To:{" "}
+                        <a
+                          href={getExplorerUrl(tx.chain, tx.transaction.to)}
+                          onClick={(e) => {
+                            e.preventDefault();
+                            setExternalUrl(
+                              getExplorerUrl(tx.chain, tx.transaction.to)
+                            );
+                          }}
+                          className="text-purple-600 hover:underline"
+                        >
+                          {tx.transaction.to}
+                        </a>
                       </p>
                       {tx.transaction.value && (
                         <p className="text-sm text-gray-600 mt-1">
@@ -285,12 +320,19 @@ export default function AgentPage({
                   <div className="mt-3">
                     <a
                       href={tx.transactionLink}
-                      target="_blank"
-                      rel="noopener noreferrer"
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setExternalUrl(tx.transactionLink);
+                      }}
                       className="text-purple-600 hover:underline text-sm"
                     >
                       View on{" "}
-                      {tx.chain === "gnosis" ? "Gnosis Scan" : "Explorer"} →
+                      {tx.chain === "gnosis"
+                        ? "Gnosis Scan"
+                        : tx.chain === "base"
+                        ? "Base Scan"
+                        : "Etherscan"}
+                      →
                     </a>
                   </div>
                 </div>
@@ -305,8 +347,9 @@ export default function AgentPage({
           </div>
         </div>
 
-        <div className="lg:col-span-2 max-h-full min-h-[550px]">
-          <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm sticky top-8 overflow-y-auto">
+        {/* Chat section - Updated width */}
+        <div className="flex-1">
+          <div className="p-2 md:p-4 flex flex-col h-[800px] border border-gray-200">
             <ChatComponent
               onSend={sendMessage}
               messages={messages}

@@ -50,7 +50,6 @@ export default function ChatComponent({
       content: initialMessage,
     };
 
-    // Always include initial message at the start
     return [initialMessageObj, ...propMessages];
   }, [propMessages, initialMessage]);
 

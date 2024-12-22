@@ -3,9 +3,9 @@
 "use client";
 
 import React from "react";
-import { useState, useRef, useEffect } from "react";
+import { useState, useEffect } from "react";
 
-import { Send, Bot, ExternalLink } from "lucide-react";
+import { Bot, ExternalLink } from "lucide-react";
 
 import { motion } from "framer-motion";
 
