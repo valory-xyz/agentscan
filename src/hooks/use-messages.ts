@@ -9,13 +9,18 @@ interface UseMessagesProps {
   type?: "agent" | "general";
 }
 
+interface Message {
+  role: "user" | "assistant";
+  content: string;
+}
+
 export function useMessages({
   teamId,
   instanceId,
   type = "general",
 }: UseMessagesProps = {}) {
   const { getAccessToken } = useAuth();
-  const [messages, setMessages] = useState<any[]>([]);
+  const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
 
@@ -23,7 +28,7 @@ export function useMessages({
     setIsLoading(true);
     const accessToken = await getAccessToken();
 
-    const userMessage = { role: "user", content: message };
+    const userMessage: Message = { role: "user", content: message };
     setMessages((prev) => [...prev, userMessage]);
 
     try {
@@ -61,13 +66,13 @@ export function useMessages({
           messages: messages,
           ...(type === "agent" && { type, instance: instanceId }),
         });
-      } catch (error) {
+      } catch (error: any) {
         console.error("Error logging event:", error);
       }
 
       if (!response.ok) throw new Error("Network response was not ok");
 
-      const assistantMessage = { role: "assistant", content: "" };
+      const assistantMessage: Message = { role: "assistant", content: "" };
       setMessages((prev) => [...prev, assistantMessage]);
 
       const reader = response.body?.getReader();

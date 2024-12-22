@@ -76,6 +76,9 @@ export default function AgentPage({
     instanceId: unwrappedParams.agentId,
     type: "agent",
   });
+  const [expandedTxHashes, setExpandedTxHashes] = useState<Set<string>>(
+    new Set()
+  );
 
   const formatEthValue = (value: string) => {
     if (!value) return "0 ETH";
@@ -124,6 +127,18 @@ export default function AgentPage({
     fetchInstanceAndTransactions();
   }, [unwrappedParams.agentId]);
 
+  const toggleTxLogs = (txHash: string) => {
+    setExpandedTxHashes((prev) => {
+      const newSet = new Set(prev);
+      if (newSet.has(txHash)) {
+        newSet.delete(txHash);
+      } else {
+        newSet.add(txHash);
+      }
+      return newSet;
+    });
+  };
+
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full w-full flex-1">
@@ -147,19 +162,21 @@ export default function AgentPage({
   }
 
   return (
-    <div className="container mx-auto px-4 py-16 max-w-7xl">
-      {/* Agent Header with Details */}
+    <div className="container mx-auto px-4 py-8 md:py-16 max-w-7xl">
+      {/* Agent Header - Make image and text more responsive */}
       <div className="mb-8 border-b border-gray-200 pb-4">
-        <div className="flex items-center justify-between mb-3">
-          <div className="flex items-center gap-6 flex-grow">
+        <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3">
+          <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 flex-grow">
             <img
               src={instance.agent.image}
               alt={instance.agent.name}
-              className="w-20 h-20 rounded-full object-cover"
+              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover"
             />
             <div className="flex-grow space-y-2">
-              <h1 className="text-3xl font-bold">{instance.agent.name}</h1>
-              <div className="flex items-center gap-4">
+              <h1 className="text-2xl sm:text-3xl font-bold">
+                {instance.agent.name}
+              </h1>
+              <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <p className="text-gray-500 text-sm">
                   Created {getRelativeTime(instance.timestamp)}
                 </p>
@@ -192,10 +209,10 @@ export default function AgentPage({
             </div>
           </div>
 
-          {/* Back Button - Moved and aligned right */}
+          {/* Back button - Stack on mobile */}
           <Link
             href="/agents"
-            className="inline-flex items-center text-purple-600 hover:text-purple-700"
+            className="inline-flex items-center text-purple-600 hover:text-purple-700 mt-4 sm:mt-0"
           >
             <svg
               className="w-5 h-5 mr-2"
@@ -213,28 +230,24 @@ export default function AgentPage({
             Back to Agents
           </Link>
         </div>
-
-        {/* Agent Description */}
-        <div className="mt-6">
-          <p className="text-gray-600 leading-relaxed">
-            {instance.agent.description}
-          </p>
-        </div>
       </div>
 
-      <div className="flex flex-col lg:flex-row gap-8">
-        {/* Transactions section - Updated width */}
-        <div className="flex-1 space-y-8">
-          <div className="bg-white border border-gray-200 p-8 h-[800px] flex flex-col">
-            <h2 className="text-xl font-semibold mb-6">Agent Activity</h2>
-            <div className="space-y-6 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
+      {/* Main content area - Stack on mobile */}
+      <div className="flex flex-col lg:flex-row gap-4 lg:gap-8">
+        {/* Transactions section */}
+        <div className="flex-1 space-y-4 lg:space-y-8">
+          <div className="bg-white border border-gray-200 p-4 lg:p-8 h-[600px] lg:h-[800px] flex flex-col">
+            <h2 className="text-xl font-semibold mb-4 lg:mb-6">
+              Agent Activity
+            </h2>
+            <div className="space-y-4 lg:space-y-6 flex-1 overflow-y-auto pr-2 scrollbar-thin scrollbar-thumb-gray-300 scrollbar-track-gray-100">
               {transactions.map((tx) => (
                 <div
                   key={tx.transactionHash}
-                  className="border rounded-lg p-4 hover:shadow-md transition-shadow"
+                  className="border rounded-lg p-3 lg:p-4 hover:shadow-md transition-shadow"
                 >
-                  <div className="flex justify-between items-start mb-3">
-                    <div>
+                  <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-3">
+                    <div className="w-full sm:w-auto">
                       <span className="inline-block bg-purple-100 text-purple-600 px-2 py-1 rounded text-sm mb-2">
                         {tx.chain.toUpperCase()}
                       </span>
@@ -274,46 +287,52 @@ export default function AgentPage({
                         </p>
                       )}
                     </div>
-                    <div className="text-right">
-                      <p className="text-sm text-gray-500">
-                        {getRelativeTime(tx.timestamp)}
-                      </p>
-                    </div>
                   </div>
 
-                  {/* Add collapsible logs section */}
+                  {/* Transaction logs section - Now collapsible */}
                   {tx.transaction.logs.length > 0 && (
                     <div className="mt-3">
-                      <details className="group">
-                        <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800 flex items-center">
-                          <svg
-                            className="w-4 h-4 mr-1 transition-transform group-open:rotate-90"
-                            fill="none"
-                            stroke="currentColor"
-                            viewBox="0 0 24 24"
-                          >
-                            <path
-                              strokeLinecap="round"
-                              strokeLinejoin="round"
-                              strokeWidth={2}
-                              d="M9 5l7 7-7 7"
-                            />
-                          </svg>
-                          View Transaction Logs ({tx.transaction.logs.length})
-                        </summary>
-                        <div className="space-y-2 mt-2 pl-2">
-                          {tx.transaction.logs.map((log, index) => (
-                            <div key={index} className="bg-gray-50 p-2 rounded">
-                              <p className="text-sm font-medium text-gray-700">
-                                {log.eventName}
-                              </p>
-                              <pre className="text-xs text-gray-600 mt-1 overflow-x-auto">
-                                {log.decodedData}
-                              </pre>
+                      <div className="bg-gray-50 p-2 rounded">
+                        <p className="text-sm font-medium text-gray-700">
+                          {tx.transaction.logs[0].eventName}
+                        </p>
+                        <pre className="text-xs text-gray-600 mt-1 overflow-x-auto whitespace-pre-wrap break-all">
+                          {tx.transaction.logs[0].decodedData}
+                        </pre>
+                      </div>
+                      {tx.transaction.logs.length > 1 && (
+                        <>
+                          {expandedTxHashes.has(tx.transactionHash) && (
+                            <div className="mt-2 space-y-2">
+                              {tx.transaction.logs
+                                .slice(1)
+                                .map((log, index) => (
+                                  <div
+                                    key={index}
+                                    className="bg-gray-50 p-2 rounded"
+                                  >
+                                    <p className="text-sm font-medium text-gray-700">
+                                      {log.eventName}
+                                    </p>
+                                    <pre className="text-xs text-gray-600 mt-1 overflow-x-auto whitespace-pre-wrap break-all">
+                                      {log.decodedData}
+                                    </pre>
+                                  </div>
+                                ))}
                             </div>
-                          ))}
-                        </div>
-                      </details>
+                          )}
+                          <button
+                            onClick={() => toggleTxLogs(tx.transactionHash)}
+                            className="mt-2 text-sm text-purple-600 hover:text-purple-700"
+                          >
+                            {expandedTxHashes.has(tx.transactionHash)
+                              ? "Show Less"
+                              : `Show ${
+                                  tx.transaction.logs.length - 1
+                                } More Logs`}
+                          </button>
+                        </>
+                      )}
                     </div>
                   )}
 
@@ -337,19 +356,13 @@ export default function AgentPage({
                   </div>
                 </div>
               ))}
-
-              {transactions.length === 0 && (
-                <p className="text-gray-500 text-center py-4">
-                  No transactions found for this agent
-                </p>
-              )}
             </div>
           </div>
         </div>
 
-        {/* Chat section - Updated width */}
+        {/* Chat section */}
         <div className="flex-1">
-          <div className="p-2 md:p-4 flex flex-col h-[800px] border border-gray-200">
+          <div className="p-2 md:p-4 flex flex-col h-[600px] lg:h-[800px] border border-gray-200">
             <ChatComponent
               onSend={sendMessage}
               messages={messages}
