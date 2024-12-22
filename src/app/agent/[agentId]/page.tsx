@@ -1,9 +1,11 @@
+/* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState, useEffect, use } from "react";
 import ChatComponent from "@/components/ChatComponent";
-import { Button } from "@/components/ui/button";
-import { ChevronUp, ChevronDown } from "lucide-react";
-import { Tabs, TabsContent, TabsList, TabsTrigger } from "@/components/ui/tabs";
+
+import Link from "next/link";
+import { useMessages } from "@/hooks/use-messages";
+import { useAgent } from "@/contexts/AgentContext";
 
 const getRelativeTime = (timestamp: number) => {
   const now = Date.now();
@@ -51,21 +53,21 @@ interface InstanceResponse {
   transactions: Transaction[];
 }
 
-interface Message {
-  role: "user" | "assistant";
-  content: string;
-}
-
 export default function AgentPage({
   params,
 }: {
   params: Promise<{ agentId: string }> | { agentId: string };
 }) {
+  const { setExternalUrl, setShowAuthDialog } = useAgent();
   const unwrappedParams = "then" in params ? use(params) : params;
   const [instance, setInstance] = useState<Instance | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
-  const [messages, setMessages] = useState<Message[]>([]);
+  const { messages, sendMessage } = useMessages({
+    teamId: process.env.NEXT_PUBLIC_TEAM_ID,
+    instanceId: unwrappedParams.agentId,
+    type: "agent",
+  });
 
   const formatEthValue = (value: string) => {
     if (!value) return "0 ETH";
@@ -75,25 +77,10 @@ export default function AgentPage({
 
   const exampleQuestions = [
     "What can this agent do?",
-    "Show me its recent transactions",
+    "Tell me about this agents recent transactions",
     "How does it make decisions?",
     "What's its trading strategy?",
   ];
-
-  const mobileExampleQuestions = exampleQuestions.slice(0, 3);
-  const [showExampleQuestions, setShowExampleQuestions] = useState(true);
-  const [isMobile, setIsMobile] = useState(false);
-
-  useEffect(() => {
-    const checkMobile = () => {
-      setIsMobile(window.innerWidth < 768);
-    };
-
-    checkMobile();
-    window.addEventListener("resize", checkMobile);
-
-    return () => window.removeEventListener("resize", checkMobile);
-  }, []);
 
   useEffect(() => {
     const fetchInstance = async () => {
@@ -129,24 +116,6 @@ export default function AgentPage({
     fetchInstanceAndTransactions();
   }, [unwrappedParams.agentId]);
 
-  const sendMessage = async (message: string) => {
-    try {
-      // Add user message
-      const userMessage: Message = { role: "user", content: message };
-      setMessages((prev) => [...prev, userMessage]);
-
-      // TODO: Add API call here to get agent's response
-      // For now, simulate a response
-      const botMessage: Message = {
-        role: "assistant",
-        content: "I received your message: " + message,
-      };
-      setMessages((prev) => [...prev, botMessage]);
-    } catch (error) {
-      console.error("Error sending message:", error);
-    }
-  };
-
   if (loading) {
     return (
       <div className="flex items-center justify-center h-full w-full flex-1">
@@ -171,6 +140,27 @@ export default function AgentPage({
 
   return (
     <div className="container mx-auto px-4 py-20 max-w-7xl">
+      {/* Back Button */}
+      <Link
+        href="/agents"
+        className="inline-flex items-center text-purple-600 hover:text-purple-700 mb-6"
+      >
+        <svg
+          className="w-5 h-5 mr-2"
+          fill="none"
+          stroke="currentColor"
+          viewBox="0 0 24 24"
+        >
+          <path
+            strokeLinecap="round"
+            strokeLinejoin="round"
+            strokeWidth={2}
+            d="M15 19l-7-7 7-7"
+          />
+        </svg>
+        Back to Agents
+      </Link>
+
       {/* Agent Header with Details */}
       <div className="mb-8 border-b border-gray-200 pb-8">
         <div className="flex items-center gap-6">
@@ -256,19 +246,41 @@ export default function AgentPage({
                     </div>
                   </div>
 
-                  {/* Transaction Logs */}
-                  <div className="space-y-2 mt-3">
-                    {tx.transaction.logs.map((log, index) => (
-                      <div key={index} className="bg-gray-50 p-2 rounded">
-                        <p className="text-sm font-medium text-gray-700">
-                          {log.eventName}
-                        </p>
-                        <pre className="text-xs text-gray-600 mt-1 overflow-x-auto">
-                          {log.decodedData}
-                        </pre>
-                      </div>
-                    ))}
-                  </div>
+                  {/* Add collapsible logs section */}
+                  {tx.transaction.logs.length > 0 && (
+                    <div className="mt-3">
+                      <details className="group">
+                        <summary className="cursor-pointer text-sm text-gray-600 hover:text-gray-800 flex items-center">
+                          <svg
+                            className="w-4 h-4 mr-1 transition-transform group-open:rotate-90"
+                            fill="none"
+                            stroke="currentColor"
+                            viewBox="0 0 24 24"
+                          >
+                            <path
+                              strokeLinecap="round"
+                              strokeLinejoin="round"
+                              strokeWidth={2}
+                              d="M9 5l7 7-7 7"
+                            />
+                          </svg>
+                          View Transaction Logs ({tx.transaction.logs.length})
+                        </summary>
+                        <div className="space-y-2 mt-2 pl-2">
+                          {tx.transaction.logs.map((log, index) => (
+                            <div key={index} className="bg-gray-50 p-2 rounded">
+                              <p className="text-sm font-medium text-gray-700">
+                                {log.eventName}
+                              </p>
+                              <pre className="text-xs text-gray-600 mt-1 overflow-x-auto">
+                                {log.decodedData}
+                              </pre>
+                            </div>
+                          ))}
+                        </div>
+                      </details>
+                    </div>
+                  )}
 
                   <div className="mt-3">
                     <a
@@ -293,60 +305,18 @@ export default function AgentPage({
           </div>
         </div>
 
-        {/* Right Column: Chat Component - takes 2 columns on large screens */}
-        <div className="lg:col-span-2">
-          <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm sticky top-8">
+        <div className="lg:col-span-2 max-h-full min-h-[550px]">
+          <div className="bg-white border border-gray-200 rounded-xl p-8 shadow-sm sticky top-8 overflow-y-auto">
             <ChatComponent
               onSend={sendMessage}
               messages={messages}
               initialMessage={`Hi there! I'm ${instance?.agent.name}. Ask me anything about what I do!`}
               placeholder="Ask this agent anything..."
-              onExternalLinkClick={(url) => window.open(url, "_blank")}
-            >
-              <div className="flex flex-col gap-2 mt-4">
-                <Button
-                  variant="ghost"
-                  size="sm"
-                  onClick={() => setShowExampleQuestions(!showExampleQuestions)}
-                  className="text-gray-500 hover:text-gray-700 mx-auto"
-                >
-                  {showExampleQuestions ? (
-                    <>
-                      Hide examples <ChevronUp className="h-4 w-4 ml-2" />
-                    </>
-                  ) : (
-                    <>
-                      Show examples <ChevronDown className="h-4 w-4 ml-2" />
-                    </>
-                  )}
-                </Button>
-
-                {showExampleQuestions && (
-                  <div className="flex flex-wrap gap-2 justify-center mb-2">
-                    {(isMobile ? mobileExampleQuestions : exampleQuestions).map(
-                      (question, index) => (
-                        <Button
-                          key={index}
-                          variant="outline"
-                          onClick={() => {
-                            // Handle question click
-                            // const userMessage = {
-                            //   role: "user",
-                            //   content: question,
-                            // };
-                            // setMessages((prev) => [...prev, userMessage]);
-                            // sendMessage(question, [...messages, userMessage]);
-                          }}
-                          className="text-gray-600 hover:text-gray-800 text-sm py-1 px-4"
-                        >
-                          {question}
-                        </Button>
-                      )
-                    )}
-                  </div>
-                )}
-              </div>
-            </ChatComponent>
+              onExternalLinkClick={(url) => {
+                setExternalUrl(url);
+              }}
+              exampleQuestions={exampleQuestions}
+            />
           </div>
         </div>
       </div>

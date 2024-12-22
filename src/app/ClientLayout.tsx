@@ -10,6 +10,8 @@ import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { LogOut, LogIn } from "lucide-react";
 import { usePathname } from "next/navigation";
+import GlobalDialogs from "@/components/GlobalDialogs";
+import { AgentProvider } from "@/contexts/AgentContext";
 
 // Create a separate header component to use hooks
 function Header() {
@@ -85,74 +87,77 @@ export default function ClientLayout({
   }, []);
 
   return (
-    <PrivyProvider
-      appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""}
-      config={{
-        loginMethods: ["email", "wallet"],
-        appearance: {
-          theme: "light",
-          accentColor: "#A855F7",
-          showWalletLoginFirst: false,
-        },
-      }}
-    >
-      <div
-        className={`${geistSansVariable} ${geistMonoVariable} min-h-screen flex flex-col`}
+    <AgentProvider>
+      <PrivyProvider
+        appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""}
+        config={{
+          loginMethods: ["email", "wallet"],
+          appearance: {
+            theme: "light",
+            accentColor: "#A855F7",
+            showWalletLoginFirst: false,
+          },
+        }}
       >
-        <Header />
-        <main className="flex-1 flex flex-col">{children}</main>
-        <footer className="w-full py-2 md:py-3 bg-muted/75 mt-auto fixed bottom-0">
-          <div className="container mx-auto px-2 md:px-4 relative">
-            <div className="flex justify-between items-center">
-              <div className="flex items-center space-x-4">
-                <Button
-                  variant="ghost"
-                  className="text-white hover:text-black bg-purple-600 transition-colors text-sm md:text-base px-2 md:px-4"
-                  onClick={() => {
-                    window.open("https://t.me/ExploreSupport", "_blank");
-                  }}
-                >
-                  <span className="hidden sm:inline">Give</span> Feedback
-                </Button>
-              </div>
-
-              <div className="flex flex-col items-center">
-                <p className="text-xs md:text-sm text-muted-foreground text-center">
-                  Copyright Explore Labs, Inc 2024 •{" "}
-                  <Link
-                    href="/disclaimer"
-                    className="hover:text-purple-600 transition-colors"
+        <div
+          className={`${geistSansVariable} ${geistMonoVariable} min-h-screen flex flex-col`}
+        >
+          <Header />
+          <main className="flex-1 flex flex-col">{children}</main>
+          <footer className="w-full py-2 md:py-3 bg-muted/75 mt-auto fixed bottom-0">
+            <div className="container mx-auto px-2 md:px-4 relative">
+              <div className="flex justify-between items-center">
+                <div className="flex items-center space-x-4">
+                  <Button
+                    variant="ghost"
+                    className="text-white hover:text-black bg-purple-600 transition-colors text-sm md:text-base px-2 md:px-4"
                     onClick={() => {
-                      logEvent("external_link_clicked", {
-                        url: "/disclaimer",
-                        context: "footer_disclaimer",
-                        teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-                      });
+                      window.open("https://t.me/ExploreSupport", "_blank");
                     }}
                   >
-                    Disclaimer & Privacy Policy
-                  </Link>
-                </p>
-              </div>
+                    <span className="hidden sm:inline">Give</span> Feedback
+                  </Button>
+                </div>
 
-              <a
-                href="https://olas.network"
-                target="_blank"
-                className="flex items-center"
-                onClick={() => {
-                  logEvent("external_link_clicked", {
-                    url: "https://olas.network",
-                    context: "footer_link",
-                    teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-                  });
-                }}
-              >
-                <img src="/olas.svg" alt="Autonolas" className="h-6 md:h-9" />
-              </a>
+                <div className="flex flex-col items-center">
+                  <p className="text-xs md:text-sm text-muted-foreground text-center">
+                    Copyright Explore Labs, Inc 2024 •{" "}
+                    <Link
+                      href="/disclaimer"
+                      className="hover:text-purple-600 transition-colors"
+                      onClick={() => {
+                        logEvent("external_link_clicked", {
+                          url: "/disclaimer",
+                          context: "footer_disclaimer",
+                          teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+                        });
+                      }}
+                    >
+                      Disclaimer & Privacy Policy
+                    </Link>
+                  </p>
+                </div>
+
+                <a
+                  href="https://olas.network"
+                  target="_blank"
+                  className="flex items-center"
+                  onClick={() => {
+                    logEvent("external_link_clicked", {
+                      url: "https://olas.network",
+                      context: "footer_link",
+                      teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
+                    });
+                  }}
+                >
+                  <img src="/olas.svg" alt="Autonolas" className="h-6 md:h-9" />
+                </a>
+              </div>
             </div>
-          </div>
-        </footer>
-      </div>
-    </PrivyProvider>
+          </footer>
+        </div>
+        <GlobalDialogs />
+      </PrivyProvider>
+    </AgentProvider>
   );
 }
