@@ -58,7 +58,7 @@ export default function AgentPage({
 }: {
   params: Promise<{ agentId: string }> | { agentId: string };
 }) {
-  const { setExternalUrl, setShowAuthDialog } = useAgent();
+  const { setExternalUrl } = useAgent();
   const unwrappedParams = "then" in params ? use(params) : params;
   const [instance, setInstance] = useState<Instance | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
