@@ -61,19 +61,14 @@ interface InstanceResponse {
   transactions: Transaction[];
 }
 
-export default function AgentPage({
-  params,
-}: {
-  params: Promise<{ agentId: string }> | { agentId: string };
-}) {
+export default function AgentPage({ params }: { params: { agentId: string } }) {
   const { setExternalUrl } = useAgent();
-  const unwrappedParams = "then" in params ? use(params) : params;
   const [instance, setInstance] = useState<Instance | null>(null);
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const { messages, sendMessage } = useMessages({
     teamId: process.env.NEXT_PUBLIC_TEAM_ID,
-    instanceId: unwrappedParams.agentId,
+    instanceId: params.agentId,
     type: "agent",
   });
   const [expandedTxHashes, setExpandedTxHashes] = useState<Set<string>>(
@@ -97,7 +92,7 @@ export default function AgentPage({
     const fetchInstance = async () => {
       try {
         const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/instance`);
-        url.searchParams.append("id", unwrappedParams.agentId);
+        url.searchParams.append("id", params.agentId);
 
         const response = await fetch(url.toString());
         const data: InstanceResponse = await response.json();
@@ -112,7 +107,7 @@ export default function AgentPage({
 
     const fetchTransactions = async () => {
       const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/transactions`);
-      url.searchParams.append("instance", unwrappedParams.agentId);
+      url.searchParams.append("instance", params.agentId);
 
       const response = await fetch(url.toString());
       const data = await response.json();
@@ -125,7 +120,7 @@ export default function AgentPage({
     };
 
     fetchInstanceAndTransactions();
-  }, [unwrappedParams.agentId]);
+  }, [params.agentId]);
 
   const toggleTxLogs = (txHash: string) => {
     setExpandedTxHashes((prev) => {
