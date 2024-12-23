@@ -102,6 +102,7 @@ export default function AgentPage({
 
         const response = await fetch(url.toString());
         const data: InstanceResponse = await response.json();
+
         setInstance(data.instance);
         setTransactions(data.transactions || []);
       } catch (error) {
@@ -168,44 +169,48 @@ export default function AgentPage({
       <div className="mb-8 border-b border-gray-200 pb-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 flex-grow">
-            <img
-              src={instance.agent.image}
-              alt={instance.agent.name}
-              className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover"
-            />
+            {instance.agent?.image && (
+              <img
+                src={instance.agent.image}
+                alt={instance.agent?.name || "Agent"}
+                className="w-16 h-16 sm:w-20 sm:h-20 rounded-full object-cover"
+              />
+            )}
             <div className="flex-grow space-y-2">
               <h1 className="text-2xl sm:text-3xl font-bold">
-                {instance.agent.name}
+                {instance.agent?.name || "Unnamed Agent"}
               </h1>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <p className="text-gray-500 text-sm">
                   Created {getRelativeTime(instance.timestamp)}
                 </p>
-                <div className="">
-                  <a
-                    href={instance.agent.codeUri}
-                    onClick={(e) => {
-                      e.preventDefault();
-                      setExternalUrl(instance.agent.codeUri);
-                    }}
-                    className="text-purple-600 text-sm hover:text-purple-700 font-medium hover:underline inline-flex items-center"
-                  >
-                    View Code Repository
-                    <svg
-                      className="w-4 h-4 ml-1"
-                      fill="none"
-                      stroke="currentColor"
-                      viewBox="0 0 24 24"
+                {instance.agent?.codeUri && (
+                  <div className="">
+                    <a
+                      href={instance.agent.codeUri}
+                      onClick={(e) => {
+                        e.preventDefault();
+                        setExternalUrl(instance.agent.codeUri);
+                      }}
+                      className="text-purple-600 text-sm hover:text-purple-700 font-medium hover:underline inline-flex items-center"
                     >
-                      <path
-                        strokeLinecap="round"
-                        strokeLinejoin="round"
-                        strokeWidth={2}
-                        d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
-                      />
-                    </svg>
-                  </a>
-                </div>
+                      View Code Repository
+                      <svg
+                        className="w-4 h-4 ml-1"
+                        fill="none"
+                        stroke="currentColor"
+                        viewBox="0 0 24 24"
+                      >
+                        <path
+                          strokeLinecap="round"
+                          strokeLinejoin="round"
+                          strokeWidth={2}
+                          d="M10 6H6a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-4M14 4h6m0 0v6m0-6L10 14"
+                        />
+                      </svg>
+                    </a>
+                  </div>
+                )}
               </div>
             </div>
           </div>
@@ -367,7 +372,9 @@ export default function AgentPage({
             <ChatComponent
               onSend={sendMessage}
               messages={messages}
-              initialMessage={`Hi there! I'm ${instance?.agent.name}. Ask me anything about what I do!`}
+              initialMessage={`Hi there! I'm ${
+                instance.agent?.name || "your agent"
+              }. Ask me anything about what I do!`}
               placeholder="Ask this agent anything..."
               onExternalLinkClick={(url) => {
                 setExternalUrl(url);
