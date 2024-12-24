@@ -303,10 +303,15 @@ export default function AgentPage({
                   className="border rounded-lg p-3 lg:p-4 hover:shadow-md transition-shadow"
                 >
                   <div className="flex flex-col sm:flex-row justify-between items-start gap-2 mb-3">
-                    <div className="w-full sm:w-auto">
-                      <span className="inline-block bg-purple-100 text-purple-600 px-2 py-1 rounded text-sm mb-2">
-                        {tx.chain.toUpperCase()}
-                      </span>
+                    <div className="w-full">
+                      <div className="flex items-center w-full gap-2 mb-2 justify-between">
+                        <span className="inline-block bg-purple-100 text-purple-600 px-2 py-1 rounded text-sm">
+                          {tx.chain.toUpperCase()}
+                        </span>
+                        <span className="text-sm text-gray-500">
+                          {getRelativeTime(tx.timestamp)}
+                        </span>
+                      </div>
                       <p className="text-sm text-gray-600">
                         From:{" "}
                         <a
