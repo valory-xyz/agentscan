@@ -84,10 +84,10 @@ export default function AgentPage({
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
 
-  const formatEthValue = (value: string) => {
-    if (!value) return "0 ETH";
-    const ethValue = parseInt(value) / 1e18;
-    return `${ethValue} ETH`;
+  const formatEthValue = (value: string, chain: string) => {
+    if (!value) return "0 " + (chain === "gnosis" ? "xDAI" : "ETH");
+    const ethValue = (parseInt(value) / 1e18).toFixed(2);
+    return `${ethValue} ${chain === "gnosis" ? "xDAI" : "ETH"}`;
   };
 
   const exampleQuestions = [
@@ -337,7 +337,8 @@ export default function AgentPage({
                       </p>
                       {tx.transaction.value && (
                         <p className="text-sm text-gray-600 mt-1">
-                          Value: {formatEthValue(tx.transaction.value)}
+                          Value:{" "}
+                          {formatEthValue(tx.transaction.value, tx.chain)}
                         </p>
                       )}
                     </div>
