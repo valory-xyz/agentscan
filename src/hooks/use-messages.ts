@@ -67,6 +67,7 @@ export function useMessages({
           source: "web",
           messages: messages,
           ...(type === "agent" && { type, instance: instanceId }),
+          type,
         });
       } catch (error: any) {
         console.error("Error logging event:", error);
@@ -120,6 +121,8 @@ export function useMessages({
           question: message,
           source: "web",
           answer: fullContent,
+          type,
+          ...(type === "agent" && { instance: instanceId }),
         });
       } catch (error) {
         console.error("Error logging completion event:", error);
