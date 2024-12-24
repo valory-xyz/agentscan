@@ -4,7 +4,12 @@
 import React, { useEffect } from "react";
 import AnimatedRobot from "@/components/AnimatedRobot";
 import Link from "next/link";
-import { initAmplitude, logEvent, setUserId } from "@/lib/amplitude";
+import {
+  initAmplitude,
+  logEvent,
+  setUserId,
+  logPageView,
+} from "@/lib/amplitude";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -23,17 +28,21 @@ function Header() {
     setUserId(user?.id || null);
   }, [user]);
 
+  useEffect(() => {
+    logPageView(pathname);
+  }, [pathname]);
+
   return (
     <div className="fixed top-0 left-0 w-full bg-transparent z-50">
       <div className="flex justify-between items-center px-2 md:px-4 py-2">
-        <Link 
-          href="/onboarding" 
+        <Link
+          href="/onboarding"
           className="text-lg md:text-xl font-bold"
           onClick={(e) => {
             e.preventDefault();
-            router.push('/onboarding');
-            logEvent('logo_clicked', {
-              destination: 'onboarding'
+            router.push("/onboarding");
+            logEvent("logo_clicked", {
+              destination: "onboarding",
             });
           }}
         >
