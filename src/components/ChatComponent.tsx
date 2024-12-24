@@ -160,7 +160,7 @@ export default function ChatComponent({
                   animate: { opacity: 1, y: 0 },
                 }}
                 transition={{ duration: 0.3, ease: "easeOut" }}
-                className={`rounded-2xl px-4 py-2 shadow-sm ${
+                className={`rounded-2xl px-4 py-2 shadow-sm break-words ${
                   message.role === "user"
                     ? "bg-purple-500 text-white"
                     : "bg-gray-100"
