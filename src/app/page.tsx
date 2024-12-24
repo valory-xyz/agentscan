@@ -29,12 +29,12 @@ export default function Home() {
   });
 
   const exampleQuestions = [
-    "What is an OLAS Agent?",
-    "Give me an example of an OLAS Agent",
-    "How does the trader agent work?",
-    "How do I make my own agent?",
-    "Can you tell me how to stake OLAS in the easiest way possible?",
-    "Give me content I can look at to learn more about OLAS",
+    "🤖 What is an OLAS Agent?",
+    "💡 Give me an example of an OLAS Agent",
+    "📈 How does the trader agent work?",
+    "🛠️ How do I make my own agent?",
+    "💰 Can you tell me how to stake OLAS in the easiest way possible?",
+    "📚 Give me content I can look at to learn more about OLAS",
   ];
 
   const [showLanding, setShowLanding] = useState(true);
