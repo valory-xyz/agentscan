@@ -72,7 +72,6 @@ export default function ChatComponent({
     const container = messagesContainerRef.current;
     if (!container || userScrolled) return;
 
-    // Scroll to bottom after new messages render
     setTimeout(() => {
       container.scrollTop = container.scrollHeight;
     }, 100);

@@ -6,6 +6,8 @@ import ChatComponent from "@/components/ChatComponent";
 import Link from "next/link";
 import { useMessages } from "@/hooks/use-messages";
 import { useAgent } from "@/contexts/AgentContext";
+import ReactMarkdown from "react-markdown";
+import { ExternalLink } from "lucide-react";
 
 const getRelativeTime = (timestamp: number) => {
   const now = Date.now();
@@ -215,7 +217,6 @@ export default function AgentPage({
 
   return (
     <div className="container mx-auto px-4 py-8 md:py-16 max-w-7xl">
-      {/* Agent Header - Make image and text more responsive */}
       <div className="mb-8 border-b border-gray-200 pb-4">
         <div className="flex flex-col sm:flex-row items-start sm:items-center justify-between mb-3">
           <div className="flex flex-col sm:flex-row items-start sm:items-center gap-4 sm:gap-6 flex-grow">
@@ -228,7 +229,26 @@ export default function AgentPage({
             )}
             <div className="flex-grow space-y-2">
               <h1 className="text-2xl sm:text-3xl font-bold">
-                {instance.agent?.name || "Unnamed Agent"}
+                <ReactMarkdown
+                  components={{
+                    a: ({ href, children }) => (
+                      <a
+                        href="#"
+                        onClick={(e) => {
+                          e.preventDefault();
+                          if (href) {
+                            setExternalUrl(href);
+                          }
+                        }}
+                        className="text-blue-500 hover:underline"
+                      >
+                        {children} <ExternalLink className="inline h-3 w-4" />
+                      </a>
+                    ),
+                  }}
+                >
+                  {instance.agent.name}
+                </ReactMarkdown>
               </h1>
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <p className="text-gray-500 text-sm">

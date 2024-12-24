@@ -2,9 +2,12 @@
 /* eslint-disable react-hooks/exhaustive-deps */
 "use client";
 
+import { useAgent } from "@/contexts/AgentContext";
+import { ExternalLink } from "lucide-react";
 import Link from "next/link";
 
 import { useEffect, useState, useRef, useCallback } from "react";
+import ReactMarkdown from "react-markdown";
 
 interface Transaction {
   id: string;
@@ -24,6 +27,7 @@ interface TransactionsResponse {
 }
 
 export default function TransactionsPage() {
+  const { setExternalUrl } = useAgent();
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
@@ -55,6 +59,7 @@ export default function TransactionsPage() {
 
       const response = await fetch(url.toString());
       const data: TransactionsResponse = await response.json();
+      console.log(data);
 
       if (data.transactions.length > 0) {
         setTransactions((prev) => [...prev, ...data.transactions]);
@@ -146,10 +151,28 @@ export default function TransactionsPage() {
                 </div>
               </div>
 
-              {/* Content Container */}
               <div className="p-6">
                 <h3 className="text-xl font-semibold mb-2 text-gray-800">
-                  {tx.agent.name}
+                  <ReactMarkdown
+                    components={{
+                      a: ({ href, children }) => (
+                        <a
+                          href="#"
+                          onClick={(e) => {
+                            e.preventDefault();
+                            if (href) {
+                              setExternalUrl(href);
+                            }
+                          }}
+                          className="text-blue-500 hover:underline"
+                        >
+                          {children} <ExternalLink className="inline h-3 w-4" />
+                        </a>
+                      ),
+                    }}
+                  >
+                    {tx.agent.name}
+                  </ReactMarkdown>
                 </h3>
                 <p className="text-gray-600 text-sm line-clamp-2">
                   {tx.agent.description}
