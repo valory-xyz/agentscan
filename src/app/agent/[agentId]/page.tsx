@@ -250,6 +250,11 @@ export default function AgentPage({
                   {instance.agent.name}
                 </ReactMarkdown>
               </h1>
+              {instance.agent.description && (
+                <p className="text-gray-600 text-sm sm:text-base">
+                  {instance.agent.description}
+                </p>
+              )}
               <div className="flex flex-col sm:flex-row sm:items-center gap-2 sm:gap-4">
                 <p className="text-gray-500 text-sm">
                   Created {getRelativeTime(instance.timestamp)}
