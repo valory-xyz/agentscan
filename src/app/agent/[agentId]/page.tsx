@@ -86,7 +86,9 @@ export default function AgentPage({
 
   const formatEthValue = (value: string, chain: string) => {
     if (!value) return "0 " + (chain === "gnosis" ? "xDAI" : "ETH");
-    const ethValue = (parseInt(value) / 1e18).toFixed(2);
+    const rawValue = parseInt(value) / 1e18;
+    const ethValue =
+      rawValue % 1 === 0 ? rawValue.toString() : rawValue.toFixed(2);
     return `${ethValue} ${chain === "gnosis" ? "xDAI" : "ETH"}`;
   };
 
