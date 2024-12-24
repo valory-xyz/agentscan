@@ -95,10 +95,9 @@ export default function AgentPage({
   };
 
   const exampleQuestions = [
-    "🤔 What can this agent do?",
-    "📝 Tell me some things about this agent based on its code and transactions.",
-    "🧠 How does it make decisions?",
-    "📋 Describe this agent in a few sentences",
+    "🤔 What does this agent do?",
+    "📝 Describe this agent's strategy",
+    "🧠 How does this agent make decisions?",
   ];
 
   const fetchTransactions = async (cursor?: string) => {
