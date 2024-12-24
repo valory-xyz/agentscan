@@ -9,7 +9,7 @@ import { PrivyProvider } from "@privy-io/react-auth";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
 import { LogOut, LogIn } from "lucide-react";
-import { usePathname } from "next/navigation";
+import { usePathname, useRouter } from "next/navigation";
 import GlobalDialogs from "@/components/GlobalDialogs";
 import { AgentProvider } from "@/contexts/AgentContext";
 
@@ -17,6 +17,7 @@ import { AgentProvider } from "@/contexts/AgentContext";
 function Header() {
   const { isAuthenticated, login, logout, user } = useAuth();
   const pathname = usePathname();
+  const router = useRouter();
 
   useEffect(() => {
     setUserId(user?.id || null);
@@ -25,7 +26,17 @@ function Header() {
   return (
     <div className="fixed top-0 left-0 w-full bg-transparent z-50">
       <div className="flex justify-between items-center px-2 md:px-4 py-2">
-        <Link href="/" className="text-lg md:text-xl font-bold">
+        <Link 
+          href="/onboarding" 
+          className="text-lg md:text-xl font-bold"
+          onClick={(e) => {
+            e.preventDefault();
+            router.push('/onboarding');
+            logEvent('logo_clicked', {
+              destination: 'onboarding'
+            });
+          }}
+        >
           <div className="flex flex-row max-h-16 items-center space-x-0 text-black hover:text-purple-600 transition-colors">
             <AnimatedRobot scale={0.35} />
             <span className="inline">agentscan</span>
@@ -34,14 +45,25 @@ function Header() {
 
         <div className="flex items-center space-x-6">
           <Link
-            href="/agents"
+            href="/"
             className={`flex items-center ${
-              pathname === "/agents"
-                ? "text-purple-600 "
+              pathname === "/"
+                ? "text-purple-600"
                 : "text-gray-600 hover:text-purple-600"
             }`}
           >
-            Agents
+            Get Started
+          </Link>
+
+          <Link
+            href="/agents"
+            className={`flex items-center ${
+              pathname === "/agents"
+                ? "text-purple-600"
+                : "text-gray-600 hover:text-purple-600"
+            }`}
+          >
+            Chat with Agents
           </Link>
 
           {isAuthenticated ? (
