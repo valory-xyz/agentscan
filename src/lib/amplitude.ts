@@ -33,3 +33,11 @@ export const logEvent = async (
     console.error("Error logging event:", error);
   }
 };
+
+export const logPageView = (pathname: string) => {
+  logEvent("page_view", {
+    path: pathname,
+    url: window.location.href,
+    referrer: document.referrer,
+  });
+};
