@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useState, useEffect, use } from "react";
+import { useState, useEffect, use, useRef } from "react";
 import ChatComponent from "@/components/ChatComponent";
 
 import Link from "next/link";
@@ -80,6 +80,9 @@ export default function AgentPage({
   const [expandedTxHashes, setExpandedTxHashes] = useState<Set<string>>(
     new Set()
   );
+  const [isLoadingMore, setIsLoadingMore] = useState(false);
+  const [nextCursor, setNextCursor] = useState<string | null>(null);
+  const loadingRef = useRef<HTMLDivElement>(null);
 
   const formatEthValue = (value: string) => {
     if (!value) return "0 ETH";
@@ -89,10 +92,34 @@ export default function AgentPage({
 
   const exampleQuestions = [
     "What can this agent do?",
-    "Tell me about this agents recent transactions",
+    "Tell me some things about this agent based on its code and transactions.",
     "How does it make decisions?",
-    "What's its trading strategy?",
+    "Describe this agent in a few sentences",
   ];
+
+  const fetchTransactions = async (cursor?: string) => {
+    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/transactions`);
+    url.searchParams.append("instance", agentId);
+    if (cursor) {
+      url.searchParams.append("cursor", cursor);
+    }
+
+    try {
+      const response = await fetch(url.toString());
+      const data = await response.json();
+
+      if (cursor) {
+        // Append new transactions
+        setTransactions((prev) => [...prev, ...(data.transactions || [])]);
+      } else {
+        // Replace transactions for initial load
+        setTransactions(data.transactions || []);
+      }
+      setNextCursor(data.nextCursor);
+    } catch (error) {
+      console.error("Error fetching transactions:", error);
+    }
+  };
 
   useEffect(() => {
     const fetchInstance = async () => {
@@ -110,16 +137,6 @@ export default function AgentPage({
       } finally {
         setLoading(false);
       }
-    };
-
-    const fetchTransactions = async () => {
-      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/transactions`);
-      url.searchParams.append("instance", agentId);
-
-      const response = await fetch(url.toString());
-      const data = await response.json();
-      console.log(data);
-      setTransactions(data.transactions || []);
     };
 
     const fetchInstanceAndTransactions = async () => {
@@ -140,6 +157,37 @@ export default function AgentPage({
       return newSet;
     });
   };
+
+  const loadMore = async () => {
+    if (!nextCursor || isLoadingMore) return;
+
+    setIsLoadingMore(true);
+    await fetchTransactions(nextCursor);
+    setIsLoadingMore(false);
+  };
+
+  useEffect(() => {
+    const observer = new IntersectionObserver(
+      (entries) => {
+        const firstEntry = entries[0];
+        if (firstEntry.isIntersecting && nextCursor && !isLoadingMore) {
+          loadMore();
+        }
+      },
+      { threshold: 0.1 }
+    );
+
+    const currentLoadingRef = loadingRef.current;
+    if (currentLoadingRef) {
+      observer.observe(currentLoadingRef);
+    }
+
+    return () => {
+      if (currentLoadingRef) {
+        observer.unobserve(currentLoadingRef);
+      }
+    };
+  }, [nextCursor, isLoadingMore, loadMore]);
 
   if (loading) {
     return (
@@ -362,6 +410,20 @@ export default function AgentPage({
                   </div>
                 </div>
               ))}
+
+              {/* Loading indicator with ref */}
+              <div ref={loadingRef} className="h-4 w-full">
+                {isLoadingMore && (
+                  <div className="flex justify-center py-4">
+                    <div className="flex items-center space-x-2">
+                      <div className="w-4 h-4 border-2 border-purple-600 border-t-transparent rounded-full animate-spin"></div>
+                      <span className="text-sm text-gray-600">
+                        Loading more...
+                      </span>
+                    </div>
+                  </div>
+                )}
+              </div>
             </div>
           </div>
         </div>

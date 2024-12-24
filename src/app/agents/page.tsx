@@ -27,21 +27,30 @@ export default function TransactionsPage() {
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const [loading, setLoading] = useState(false);
+  const [initialFetchDone, setInitialFetchDone] = useState(false);
   const observerTarget = useRef<HTMLDivElement>(null);
+  const activeRequestRef = useRef<boolean>(false);
+
+  const handleObserver = useCallback(
+    (entries: IntersectionObserverEntry[]) => {
+      const [target] = entries;
+      if (target.isIntersecting && nextCursor && !loading) {
+        fetchTransactions(nextCursor);
+      }
+    },
+    [nextCursor, loading]
+  );
 
   const fetchTransactions = async (cursor?: string) => {
-    if (loading) return;
+    if (loading || activeRequestRef.current) return;
 
     try {
       setLoading(true);
+      activeRequestRef.current = true;
+
       const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/agents`);
       if (cursor) {
         url.searchParams.append("cursor", cursor);
-      }
-
-      const currentIds = transactions.map((t) => t.id);
-      if (currentIds.length > 0) {
-        url.searchParams.append("excludedIds", currentIds.join(","));
       }
 
       const response = await fetch(url.toString());
@@ -51,33 +60,31 @@ export default function TransactionsPage() {
         setTransactions((prev) => [...prev, ...data.transactions]);
       }
       setNextCursor(data.nextCursor);
+
+      // Set initialFetchDone after first fetch
+      if (!cursor) {
+        setInitialFetchDone(true);
+      }
     } catch (error) {
       console.error("Error fetching transactions:", error);
     } finally {
       setLoading(false);
+      activeRequestRef.current = false;
     }
   };
 
+  // Initial fetch
   useEffect(() => {
     setTransactions([]);
     setNextCursor(null);
+    setInitialFetchDone(false);
     fetchTransactions();
   }, []);
 
-  const handleObserver = useCallback(
-    (entries: IntersectionObserverEntry[]) => {
-      const [target] = entries;
-      if (target.isIntersecting && nextCursor && !loading) {
-        const timeoutId = setTimeout(() => {
-          fetchTransactions(nextCursor);
-        }, 500);
-        return () => clearTimeout(timeoutId);
-      }
-    },
-    [nextCursor, loading]
-  );
-
+  // Only set up the intersection observer after initial fetch and when we have a cursor
   useEffect(() => {
+    if (!initialFetchDone || !nextCursor) return;
+
     const element = observerTarget.current;
     if (!element) return;
 
@@ -92,7 +99,7 @@ export default function TransactionsPage() {
         observer.unobserve(element);
       }
     };
-  }, [handleObserver]);
+  }, [handleObserver, initialFetchDone, nextCursor]);
 
   const getRelativeTime = (timestamp: number) => {
     const now = Date.now();
