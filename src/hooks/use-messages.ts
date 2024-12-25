@@ -4,6 +4,7 @@ import { useState } from "react";
 import { useToast } from "./use-toast";
 import { logEvent } from "@/lib/amplitude";
 import { useAuth } from "./use-auth";
+import { useAgent } from "@/contexts/AgentContext";
 
 interface UseMessagesProps {
   teamId?: string;
@@ -25,6 +26,8 @@ export function useMessages({
   const [messages, setMessages] = useState<Message[]>([]);
   const [isLoading, setIsLoading] = useState(false);
   const { toast } = useToast();
+  const { setShowAuthDialog } = useAgent();
+  const { isAuthenticated } = useAuth();
 
   const sendMessage = async (message: string) => {
     setIsLoading(true);
@@ -53,10 +56,14 @@ export function useMessages({
 
       if (response.status === 429) {
         const data = await response.json();
-        toast({
-          variant: "destructive",
-          title: data.message || "Please try again later",
-        });
+        if (!isAuthenticated) {
+          setShowAuthDialog(true);
+        } else {
+          toast({
+            variant: "destructive",
+            title: data.message || "Please try again later",
+          });
+        }
         return;
       }
 
