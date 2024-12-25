@@ -1,6 +1,6 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
-import { useState, useEffect, use, useRef } from "react";
+import { useState, useEffect, use, useRef, useCallback } from "react";
 import ChatComponent from "@/components/ChatComponent";
 
 import Link from "next/link";
@@ -114,12 +114,11 @@ export default function AgentPage({
     instanceId: agentId,
     type: "agent",
   });
-  const [expandedTxHashes, setExpandedTxHashes] = useState<Set<string>>(
-    new Set()
-  );
+
   const [isLoadingMore, setIsLoadingMore] = useState(false);
   const [nextCursor, setNextCursor] = useState<string | null>(null);
   const loadingRef = useRef<HTMLDivElement>(null);
+  const [expandedLogs, setExpandedLogs] = useState<boolean>(false);
 
   const formatEthValue = (value: string, chain: string) => {
     if (!value) return "0 " + (chain === "gnosis" ? "xDAI" : "ETH");
@@ -135,30 +134,31 @@ export default function AgentPage({
     "🧠 How does this agent make decisions?",
   ];
 
-  const fetchTransactions = async (cursor?: string) => {
-    const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/transactions`);
-    url.searchParams.append("instance", agentId);
-    if (cursor) {
-      url.searchParams.append("cursor", cursor);
-    }
-
-    try {
-      const response = await fetch(url.toString());
-      const data = await response.json();
-      console.log(data);
-
+  const fetchTransactions = useCallback(
+    async (cursor?: string) => {
+      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/transactions`);
+      url.searchParams.append("instance", agentId);
       if (cursor) {
-        // Append new transactions
-        setTransactions((prev) => [...prev, ...(data.transactions || [])]);
-      } else {
-        // Replace transactions for initial load
-        setTransactions(data.transactions || []);
+        url.searchParams.append("cursor", cursor);
       }
-      setNextCursor(data.nextCursor);
-    } catch (error) {
-      console.error("Error fetching transactions:", error);
-    }
-  };
+
+      try {
+        const response = await fetch(url.toString());
+        const data = await response.json();
+        console.log(data);
+
+        if (cursor) {
+          setTransactions((prev) => [...prev, ...(data.transactions || [])]);
+        } else {
+          setTransactions(data.transactions || []);
+        }
+        setNextCursor(data.nextCursor);
+      } catch (error) {
+        console.error("Error fetching transactions:", error);
+      }
+    },
+    [agentId]
+  );
 
   useEffect(() => {
     const fetchInstance = async () => {
@@ -183,27 +183,15 @@ export default function AgentPage({
     };
 
     fetchInstanceAndTransactions();
-  }, [agentId]);
+  }, [agentId, fetchTransactions]);
 
-  const toggleTxLogs = (txHash: string) => {
-    setExpandedTxHashes((prev) => {
-      const newSet = new Set(prev);
-      if (newSet.has(txHash)) {
-        newSet.delete(txHash);
-      } else {
-        newSet.add(txHash);
-      }
-      return newSet;
-    });
-  };
-
-  const loadMore = async () => {
+  const loadMore = useCallback(async () => {
     if (!nextCursor || isLoadingMore) return;
 
     setIsLoadingMore(true);
     await fetchTransactions(nextCursor);
     setIsLoadingMore(false);
-  };
+  }, [nextCursor, isLoadingMore, fetchTransactions]);
 
   useEffect(() => {
     const observer = new IntersectionObserver(
@@ -411,43 +399,39 @@ export default function AgentPage({
                     </div>
                   </div>
 
-                  {/* Transaction logs section - Now collapsible */}
+                  {/* Transaction logs section */}
                   {tx.transaction.logs.length > 0 && (
                     <div className="mt-3">
-                      {Object.entries(groupLogsByType(tx.transaction.logs)).map(
-                        ([eventType, logs]) => (
-                          <div key={eventType} className="mb-3">
-                            <div className="bg-gray-50 p-3 rounded-lg">
-                              <h4 className="text-sm font-semibold text-gray-700 mb-2">
-                                {eventType} ({logs.length})
-                              </h4>
-                              {(expandedTxHashes.has(tx.transactionHash)
-                                ? logs
-                                : logs.slice(0, 1)
-                              ).map((log, idx) => (
-                                <div key={idx} className="mb-2 last:mb-0">
-                                  <pre className="text-xs text-gray-600 whitespace-pre-wrap break-all bg-white p-2 rounded border border-gray-200">
-                                    {formatDecodedData(log.decodedData)}
-                                  </pre>
-                                </div>
-                              ))}
+                      <div className="bg-gray-50 p-3 rounded-lg">
+                        <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                          Transaction Logs ({tx.transaction.logs.length})
+                        </h4>
+                        {(expandedLogs
+                          ? tx.transaction.logs
+                          : tx.transaction.logs.slice(0, 2)
+                        ).map((log, idx) => (
+                          <div key={idx} className="mb-2 last:mb-0">
+                            <div className="text-xs text-gray-500 mb-1">
+                              {log.eventName}
                             </div>
+                            <pre className="text-xs text-gray-600 whitespace-pre-wrap break-all bg-white p-2 rounded border border-gray-200">
+                              {formatDecodedData(log.decodedData)}
+                            </pre>
                           </div>
-                        )
-                      )}
-
-                      {tx.transaction.logs.length > 1 && (
-                        <button
-                          onClick={() => toggleTxLogs(tx.transactionHash)}
-                          className="mt-2 text-sm text-purple-600 hover:text-purple-700"
-                        >
-                          {expandedTxHashes.has(tx.transactionHash)
-                            ? "Show Less"
-                            : `Show ${
-                                tx.transaction.logs.length - 1
-                              } More Logs`}
-                        </button>
-                      )}
+                        ))}
+                        {tx.transaction.logs.length > 2 && (
+                          <button
+                            onClick={() => setExpandedLogs(!expandedLogs)}
+                            className="mt-2 text-sm text-purple-600 hover:text-purple-700 font-medium"
+                          >
+                            {expandedLogs
+                              ? "Show Less ↑"
+                              : `Show ${
+                                  tx.transaction.logs.length - 2
+                                } More Logs ↓`}
+                          </button>
+                        )}
+                      </div>
                     </div>
                   )}
 
