@@ -85,19 +85,6 @@ const formatDecodedData = (decodedData: string) => {
   }
 };
 
-// Add this helper to group logs by type
-const groupLogsByType = (logs: TransactionLog[]) => {
-  const groups: { [key: string]: TransactionLog[] } = {};
-  logs.forEach((log) => {
-    const type = log.eventName;
-    if (!groups[type]) {
-      groups[type] = [];
-    }
-    groups[type].push(log);
-  });
-  return groups;
-};
-
 export default function AgentPage({
   params,
 }: {
