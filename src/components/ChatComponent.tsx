@@ -5,7 +5,6 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
-import { Input } from "@/components/ui/input";
 import ReactMarkdown from "react-markdown";
 import { ExternalLink, Loader2 } from "lucide-react";
 import { motion } from "framer-motion";
@@ -92,13 +91,14 @@ export default function ChatComponent({
     e.preventDefault();
     if (!message.trim() || isLoading) return;
 
+    const currentMessage = message;
+    setMessage("");
+
     try {
       setIsLoading(true);
-
       if (onSend) {
-        await onSend(message);
+        await onSend(currentMessage);
       }
-      setMessage("");
     } catch {
       toast({
         title: "Error sending message",
@@ -106,6 +106,17 @@ export default function ChatComponent({
       });
     } finally {
       setIsLoading(false);
+    }
+  };
+
+  const handleKeyDown = (e: React.KeyboardEvent<HTMLTextAreaElement>) => {
+    if (e.key === "Enter") {
+      if (e.shiftKey) {
+        e.preventDefault();
+        setMessage((prev) => prev + "\n");
+      } else {
+        handleSubmit(e);
+      }
     }
   };
 
@@ -125,6 +136,27 @@ export default function ChatComponent({
       setIsLoading(false);
     }
   };
+
+  const textareaRef = useRef<HTMLTextAreaElement>(null);
+
+  const adjustTextareaHeight = () => {
+    const textarea = textareaRef.current;
+    if (textarea) {
+      textarea.style.height = "auto";
+      textarea.style.height = `${Math.min(textarea.scrollHeight, 400)}px`;
+
+      if (textarea.scrollHeight > 400) {
+        const cursorPosition = textarea.selectionStart;
+        requestAnimationFrame(() => {
+          textarea.scrollTop = textarea.scrollHeight;
+        });
+      }
+    }
+  };
+
+  useEffect(() => {
+    adjustTextareaHeight();
+  }, [message]);
 
   return (
     <div className="flex flex-col h-full">
@@ -255,17 +287,27 @@ export default function ChatComponent({
           </div>
         )}
         <form onSubmit={handleSubmit} className="relative">
-          <Input
+          <textarea
+            ref={textareaRef}
             value={message}
-            onChange={(e) => setMessage(e.target.value)}
+            onChange={(e) => {
+              setMessage(e.target.value);
+              adjustTextareaHeight();
+            }}
+            onKeyDown={handleKeyDown}
             placeholder={placeholder}
-            className="w-full h-12 pl-4 pr-12 text-sm rounded-full border-gray-200"
+            className="w-full min-h-[56px] max-h-[400px] pl-4 pr-12 py-4 text-sm rounded-2xl border border-gray-200 resize-none"
             disabled={isLoading}
+            rows={1}
+            style={{
+              lineHeight: "1.5",
+              overflowY: "auto",
+            }}
           />
           <Button
             type="submit"
             size="icon"
-            className="absolute right-2 top-2 h-8 w-8 bg-purple-600 hover:bg-purple-700 text-white rounded-full"
+            className="absolute right-2 top-3 h-8 w-8 bg-purple-600 hover:bg-purple-700 text-white rounded-full"
             disabled={isLoading || !message.trim()}
           >
             <Send className="h-4 w-4" />

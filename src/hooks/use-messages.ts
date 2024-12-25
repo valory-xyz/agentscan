@@ -64,6 +64,7 @@ export function useMessages({
             title: data.message || "Please try again later",
           });
         }
+        setMessages((prev) => prev.filter((msg) => msg !== userMessage));
         return;
       }
 
@@ -141,7 +142,7 @@ export function useMessages({
         title: "An error occurred",
         description: "Please try again later",
       });
-      setMessages((prev) => prev.slice(0, -1));
+      setMessages((prev) => prev.filter((msg) => msg !== userMessage));
     } finally {
       setIsLoading(false);
     }
