@@ -146,7 +146,6 @@ export default function ChatComponent({
       textarea.style.height = `${Math.min(textarea.scrollHeight, 400)}px`;
 
       if (textarea.scrollHeight > 400) {
-        const cursorPosition = textarea.selectionStart;
         requestAnimationFrame(() => {
           textarea.scrollTop = textarea.scrollHeight;
         });
