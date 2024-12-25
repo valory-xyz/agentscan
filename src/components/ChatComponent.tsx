@@ -92,12 +92,12 @@ export default function ChatComponent({
     if (!message.trim() || isLoading) return;
 
     const currentMessage = message;
-    setMessage("");
 
     try {
       setIsLoading(true);
       if (onSend) {
         await onSend(currentMessage);
+        setMessage("");
       }
     } catch {
       toast({

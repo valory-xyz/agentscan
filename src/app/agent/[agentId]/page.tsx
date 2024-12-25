@@ -42,6 +42,12 @@ interface Instance {
   };
 }
 
+interface TransactionLog {
+  decodedData: string;
+  eventName: string;
+  address: string;
+}
+
 interface Transaction {
   timestamp: number;
   transactionHash: string;
@@ -50,10 +56,7 @@ interface Transaction {
     from: string;
     to: string;
     value?: string;
-    logs: {
-      decodedData: string;
-      eventName: string;
-    }[];
+    logs: TransactionLog[];
   };
   transactionLink: string;
 }
@@ -62,6 +65,38 @@ interface InstanceResponse {
   instance: Instance;
   transactions: Transaction[];
 }
+
+// Add this helper function to format the decoded data
+const formatDecodedData = (decodedData: string) => {
+  try {
+    const parsed = JSON.parse(decodedData);
+    return Object.entries(parsed)
+      .map(([key, value]) => {
+        // Truncate long hex strings for better readability
+        const displayValue =
+          typeof value === "string" && value.startsWith("0x")
+            ? `${value.slice(0, 10)}...${value.slice(-8)}`
+            : value;
+        return `${key}: ${displayValue}`;
+      })
+      .join("\n");
+  } catch {
+    return decodedData;
+  }
+};
+
+// Add this helper to group logs by type
+const groupLogsByType = (logs: TransactionLog[]) => {
+  const groups: { [key: string]: TransactionLog[] } = {};
+  logs.forEach((log) => {
+    const type = log.eventName;
+    if (!groups[type]) {
+      groups[type] = [];
+    }
+    groups[type].push(log);
+  });
+  return groups;
+};
 
 export default function AgentPage({
   params,
@@ -110,6 +145,7 @@ export default function AgentPage({
     try {
       const response = await fetch(url.toString());
       const data = await response.json();
+      console.log(data);
 
       if (cursor) {
         // Append new transactions
@@ -378,46 +414,39 @@ export default function AgentPage({
                   {/* Transaction logs section - Now collapsible */}
                   {tx.transaction.logs.length > 0 && (
                     <div className="mt-3">
-                      <div className="bg-gray-50 p-2 rounded">
-                        <p className="text-sm font-medium text-gray-700">
-                          {tx.transaction.logs[0].eventName}
-                        </p>
-                        <pre className="text-xs text-gray-600 mt-1 overflow-x-auto whitespace-pre-wrap break-all">
-                          {tx.transaction.logs[0].decodedData}
-                        </pre>
-                      </div>
-                      {tx.transaction.logs.length > 1 && (
-                        <>
-                          {expandedTxHashes.has(tx.transactionHash) && (
-                            <div className="mt-2 space-y-2">
-                              {tx.transaction.logs
-                                .slice(1)
-                                .map((log, index) => (
-                                  <div
-                                    key={index}
-                                    className="bg-gray-50 p-2 rounded"
-                                  >
-                                    <p className="text-sm font-medium text-gray-700">
-                                      {log.eventName}
-                                    </p>
-                                    <pre className="text-xs text-gray-600 mt-1 overflow-x-auto whitespace-pre-wrap break-all">
-                                      {log.decodedData}
-                                    </pre>
-                                  </div>
-                                ))}
+                      {Object.entries(groupLogsByType(tx.transaction.logs)).map(
+                        ([eventType, logs]) => (
+                          <div key={eventType} className="mb-3">
+                            <div className="bg-gray-50 p-3 rounded-lg">
+                              <h4 className="text-sm font-semibold text-gray-700 mb-2">
+                                {eventType} ({logs.length})
+                              </h4>
+                              {(expandedTxHashes.has(tx.transactionHash)
+                                ? logs
+                                : logs.slice(0, 1)
+                              ).map((log, idx) => (
+                                <div key={idx} className="mb-2 last:mb-0">
+                                  <pre className="text-xs text-gray-600 whitespace-pre-wrap break-all bg-white p-2 rounded border border-gray-200">
+                                    {formatDecodedData(log.decodedData)}
+                                  </pre>
+                                </div>
+                              ))}
                             </div>
-                          )}
-                          <button
-                            onClick={() => toggleTxLogs(tx.transactionHash)}
-                            className="mt-2 text-sm text-purple-600 hover:text-purple-700"
-                          >
-                            {expandedTxHashes.has(tx.transactionHash)
-                              ? "Show Less"
-                              : `Show ${
-                                  tx.transaction.logs.length - 1
-                                } More Logs`}
-                          </button>
-                        </>
+                          </div>
+                        )
+                      )}
+
+                      {tx.transaction.logs.length > 1 && (
+                        <button
+                          onClick={() => toggleTxLogs(tx.transactionHash)}
+                          className="mt-2 text-sm text-purple-600 hover:text-purple-700"
+                        >
+                          {expandedTxHashes.has(tx.transactionHash)
+                            ? "Show Less"
+                            : `Show ${
+                                tx.transaction.logs.length - 1
+                              } More Logs`}
+                        </button>
                       )}
                     </div>
                   )}
