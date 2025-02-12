@@ -6,7 +6,7 @@ import React, { useState, useRef, useEffect, useMemo } from "react";
 import { Send } from "lucide-react";
 import { Button } from "@/components/ui/button";
 import ReactMarkdown from "react-markdown";
-import { ExternalLink, Loader2 } from "lucide-react";
+import { ExternalLink, Loader2, Copy, Check } from "lucide-react";
 import { motion } from "framer-motion";
 import { Avatar, AvatarFallback } from "@/components/ui/avatar";
 import AnimatedRobot from "./AnimatedRobot";
@@ -42,6 +42,7 @@ export default function ChatComponent({
   const [userScrolled, setUserScrolled] = useState(false);
   const [showExampleQuestions, setShowExampleQuestions] = useState(true);
   const [isMobile, setIsMobile] = useState(false);
+  const [copiedCode, setCopiedCode] = useState<string | null>(null);
 
   const messages = useMemo(() => {
     const initialMessageObj = {
@@ -157,6 +158,12 @@ export default function ChatComponent({
     adjustTextareaHeight();
   }, [message]);
 
+  const handleCopyCode = (code: string) => {
+    navigator.clipboard.writeText(code);
+    setCopiedCode(code);
+    setTimeout(() => setCopiedCode(null), 2000);
+  };
+
   return (
     <div className="flex flex-col h-full">
       <div
@@ -220,11 +227,44 @@ export default function ChatComponent({
                           {children} <ExternalLink className="inline h-3 w-4" />
                         </a>
                       ),
-                      code: ({ children }) => (
-                        <code className="bg-muted-foreground/20 rounded px-1 py-0.5 text-xs">
-                          {children}
-                        </code>
-                      ),
+                      code: ({
+                        inline,
+                        children,
+                        ...props
+                      }: {
+                        node?: any;
+                        inline?: boolean;
+                        children?: any;
+                      }) => {
+                        const code = String(children).replace(/\n$/, "");
+                        if (inline) {
+                          return (
+                            <code
+                              className="bg-muted-foreground/20 rounded px-1 py-0.5 text-xs"
+                              {...props}
+                            >
+                              {children}
+                            </code>
+                          );
+                        }
+                        return (
+                          <div className="relative group">
+                            <button
+                              onClick={() => handleCopyCode(code)}
+                              className="absolute right-2 top-2 p-1 rounded bg-gray-800/30 hover:bg-gray-800/50 invisible group-hover:visible"
+                            >
+                              {copiedCode === code ? (
+                                <Check className="h-4 w-4 text-green-500" />
+                              ) : (
+                                <Copy className="h-4 w-4 text-gray-300" />
+                              )}
+                            </button>
+                            <code className="block bg-gray-900 text-gray-100 rounded-lg p-4 text-sm overflow-x-auto select-text">
+                              {code}
+                            </code>
+                          </div>
+                        );
+                      },
                     }}
                   >
                     {message.content}

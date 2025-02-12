@@ -9,7 +9,7 @@ import { useAgent } from "@/contexts/AgentContext";
 interface UseMessagesProps {
   teamId?: string;
   instanceId?: string;
-  type?: "agent" | "general";
+  type?: "agent" | "general" | "code";
 }
 
 interface Message {
@@ -49,7 +49,8 @@ export function useMessages({
             question: message,
             messages: [...messages, userMessage],
             teamId,
-            ...(type === "agent" && { type, instance: instanceId }),
+            type,
+            ...(type === "agent" && { instance: instanceId }),
           }),
         }
       );
