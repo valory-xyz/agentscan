@@ -1,4 +1,4 @@
-# AgentScan
+# AgentScan Frontend
 
 A modern Next.js application built with TypeScript and Tailwind CSS, designed to provide a robust and scalable web application experience.
 
@@ -103,8 +103,7 @@ For other deployment options, refer to the [Next.js deployment documentation](ht
 - **Files**: Group by feature/module
 - **Styling**: Use Tailwind CSS classes and custom utilities
 
+## License
 
-## 📄 License
-
-This project is licensed under the terms of the license included in the repository.
+This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
 
