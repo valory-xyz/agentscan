@@ -132,7 +132,6 @@ export default function AgentPage({
       try {
         const response = await fetch(url.toString());
         const data = await response.json();
-        console.log(data);
 
         if (cursor) {
           setTransactions((prev) => [...prev, ...(data.transactions || [])]);

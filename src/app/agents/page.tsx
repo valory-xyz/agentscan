@@ -59,7 +59,6 @@ export default function TransactionsPage() {
 
       const response = await fetch(url.toString());
       const data: TransactionsResponse = await response.json();
-      console.log(data);
 
       if (data.transactions.length > 0) {
         setTransactions((prev) => [...prev, ...data.transactions]);
