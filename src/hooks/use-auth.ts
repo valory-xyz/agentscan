@@ -1,6 +1,6 @@
 import { usePrivy } from "@privy-io/react-auth";
 import { useEffect } from "react";
-
+import { env } from "next-runtime-env";
 export function useAuth() {
   const { login, logout, authenticated, user, getAccessToken } = usePrivy();
 
@@ -11,7 +11,7 @@ export function useAuth() {
       Authorization: `Bearer ${await getAccessToken()}`,
     };
 
-    await fetch(`${process.env.NEXT_PUBLIC_API_URL}/auth`, {
+    await fetch(`${env("NEXT_PUBLIC_API_URL")}/auth`, {
       method: "POST",
       headers,
       body: JSON.stringify({

@@ -4,7 +4,7 @@ import { useState } from "react";
 import { useToast } from "./use-toast";
 import { useAuth } from "./use-auth";
 import { useAgent } from "@/contexts/AgentContext";
-
+import { env } from "next-runtime-env";
 interface UseMessagesProps {
   teamId?: string;
   instanceId?: string;
@@ -37,7 +37,7 @@ export function useMessages({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/conversation`,
+        `${env("NEXT_PUBLIC_API_URL")}/conversation`,
         {
           method: "POST",
           headers: {

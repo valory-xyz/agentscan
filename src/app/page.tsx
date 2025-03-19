@@ -3,6 +3,7 @@
 "use client";
 
 import { useEffect, useState } from "react";
+import { env } from "next-runtime-env";
 
 import { Bot, ExternalLink } from "lucide-react";
 
@@ -21,7 +22,7 @@ import { useMessages } from "@/hooks/use-messages";
 export default function Home() {
   const { setExternalUrl, setShowAuthDialog } = useAgent();
   const { messages, isLoading, sendMessage } = useMessages({
-    teamId: process.env.NEXT_PUBLIC_TEAM_ID,
+    teamId: env("NEXT_PUBLIC_TEAM_ID"),
   });
 
   const exampleQuestions = [

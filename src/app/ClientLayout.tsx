@@ -2,6 +2,8 @@
 "use client";
 
 import React from "react";
+import { env } from "next-runtime-env";
+
 import AnimatedRobot from "@/components/AnimatedRobot";
 import Link from "next/link";
 import { PrivyProvider } from "@privy-io/react-auth";
@@ -99,7 +101,7 @@ export default function ClientLayout({
   return (
     <AgentProvider>
       <PrivyProvider
-        appId={process.env.NEXT_PUBLIC_PRIVY_APP_ID || ""}
+        appId={env("NEXT_PUBLIC_PRIVY_APP_ID") ?? ""}
         config={{
           loginMethods: ["email", "wallet"],
           appearance: {
