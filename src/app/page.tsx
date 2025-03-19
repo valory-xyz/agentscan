@@ -2,8 +2,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 
-import React from "react";
-import { useState, useEffect } from "react";
+import { useEffect, useState } from "react";
 
 import { Bot, ExternalLink } from "lucide-react";
 
@@ -12,13 +11,10 @@ import { motion } from "framer-motion";
 import { Button } from "@/components/ui/button";
 import { Card, CardContent } from "@/components/ui/card";
 
-import { useToast } from "@/hooks/use-toast";
 import { Toaster } from "@/components/ui/toaster";
-import { logEvent } from "../lib/amplitude";
 
-import Onboarding from "@/components/Onboarding";
-import { useAuth } from "@/hooks/use-auth";
 import ChatComponent from "@/components/ChatComponent";
+import Onboarding from "@/components/Onboarding";
 import { useAgent } from "@/contexts/AgentContext";
 import { useMessages } from "@/hooks/use-messages";
 
@@ -51,16 +47,8 @@ export default function Home() {
     localStorage.setItem("hasSeenLanding", "true");
     setHasSeenLanding(true);
 
-    if (!hasSeenLanding) {
-      logEvent("landing_page_viewed", {
-        teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-      });
-    }
     setShowOnboarding(false);
     localStorage.setItem("hasSeenOnboarding", "true");
-    logEvent("chat_started", {
-      teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-    });
   };
 
   const [showOnboarding, setShowOnboarding] = useState(true);

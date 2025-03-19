@@ -9,7 +9,6 @@
     "lint": "next lint"
   },
   "dependencies": {
-    "@amplitude/analytics-browser": "^2.11.9",
     "@privy-io/react-auth": "^1.95.3",
     "@radix-ui/react-alert-dialog": "^1.1.2",
     "@radix-ui/react-avatar": "^1.1.1",

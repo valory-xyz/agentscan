@@ -1,5 +1,4 @@
 import { useAuth } from "@/hooks/use-auth";
-import { logEvent } from "@/lib/amplitude";
 import ExternalLinkDialog from "./ExternalLinkDialog";
 import {
   AlertDialog,
@@ -26,10 +25,6 @@ export default function GlobalDialogs() {
         url={externalUrl}
         onClose={() => setExternalUrl(null)}
         onConfirm={(url) => {
-          logEvent("external_link_clicked", {
-            url: cleanUrl(url),
-            teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-          });
           window.open(cleanUrl(url), "_blank");
           setExternalUrl(null);
         }}

@@ -1,15 +1,9 @@
 /* eslint-disable @next/next/no-img-element */
 "use client";
 
-import React, { useEffect } from "react";
+import React from "react";
 import AnimatedRobot from "@/components/AnimatedRobot";
 import Link from "next/link";
-import {
-  initAmplitude,
-  logEvent,
-  setUserId,
-  logPageView,
-} from "@/lib/amplitude";
 import { PrivyProvider } from "@privy-io/react-auth";
 import { useAuth } from "@/hooks/use-auth";
 import { Button } from "@/components/ui/button";
@@ -20,17 +14,9 @@ import { AgentProvider } from "@/contexts/AgentContext";
 
 // Create a separate header component to use hooks
 function Header() {
-  const { isAuthenticated, login, logout, user } = useAuth();
+  const { isAuthenticated, login, logout } = useAuth();
   const pathname = usePathname();
   const router = useRouter();
-
-  useEffect(() => {
-    setUserId(user?.id || null);
-  }, [user]);
-
-  useEffect(() => {
-    logPageView(pathname);
-  }, [pathname]);
 
   return (
     <div className="fixed top-0 left-0 w-full bg-transparent z-50">
@@ -41,9 +27,6 @@ function Header() {
           onClick={(e) => {
             e.preventDefault();
             router.push("/onboarding");
-            logEvent("logo_clicked", {
-              destination: "onboarding",
-            });
           }}
         >
           <div className="flex flex-row max-h-16 items-center space-x-0 text-black hover:text-purple-600 transition-colors">
@@ -113,10 +96,6 @@ export default function ClientLayout({
   geistSansVariable,
   geistMonoVariable,
 }: ClientLayoutProps) {
-  useEffect(() => {
-    initAmplitude();
-  }, []);
-
   return (
     <AgentProvider>
       <PrivyProvider
@@ -156,13 +135,6 @@ export default function ClientLayout({
                     <Link
                       href="/disclaimer"
                       className="hover:text-purple-600 transition-colors"
-                      onClick={() => {
-                        logEvent("external_link_clicked", {
-                          url: "/disclaimer",
-                          context: "footer_disclaimer",
-                          teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-                        });
-                      }}
                     >
                       Disclaimer & Privacy Policy
                     </Link>
@@ -173,13 +145,6 @@ export default function ClientLayout({
                   href="https://olas.network"
                   target="_blank"
                   className="flex items-center"
-                  onClick={() => {
-                    logEvent("external_link_clicked", {
-                      url: "https://olas.network",
-                      context: "footer_link",
-                      teamId: process.env.NEXT_PUBLIC_TEAM_ID || "",
-                    });
-                  }}
                 >
                   <img src="/olas.svg" alt="Autonolas" className="h-6 md:h-9" />
                 </a>
