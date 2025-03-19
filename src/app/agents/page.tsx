@@ -5,7 +5,7 @@
 import { useAgent } from "@/contexts/AgentContext";
 import { ExternalLink } from "lucide-react";
 import Link from "next/link";
-
+import { env } from "next-runtime-env";
 import { useEffect, useState, useRef, useCallback } from "react";
 import ReactMarkdown from "react-markdown";
 
@@ -52,7 +52,7 @@ export default function TransactionsPage() {
       setLoading(true);
       activeRequestRef.current = true;
 
-      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/agents`);
+      const url = new URL(`${env("NEXT_PUBLIC_API_URL")}/agents`);
       if (cursor) {
         url.searchParams.append("cursor", cursor);
       }

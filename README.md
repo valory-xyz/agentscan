@@ -5,6 +5,7 @@ A modern Next.js application built with TypeScript and Tailwind CSS, designed to
 ## 🚀 Features
 
 - **Modern Tech Stack**
+
   - Next.js 14 with App Router
   - TypeScript for type safety
   - Tailwind CSS for styling
@@ -26,24 +27,27 @@ A modern Next.js application built with TypeScript and Tailwind CSS, designed to
 ## 🛠️ Installation
 
 1. Clone the repository:
+
    ```bash
    git clone git@github.com:ExploreLabsxyz/agentscan.git
    cd agentscan
    ```
 
 2. Clone the backend repository:
+
    ```bash
    git clone git@github.com:ExploreLabsxyz/agentscan-express.git
    cd agentscan-express
    ```
 
-2. Install dependencies:
+3. Install dependencies:
+
    ```bash
    npm install
 
    ```
 
-3. Set up environment variables:
+4. Set up environment variables:
    ```bash
    cp .env.example .env.local
    ```
@@ -86,14 +90,24 @@ agentscan/
 
 ## 🚀 Deployment
 
-The application can be deployed using Vercel:
+The application can be deployed using Docker:
 
-1. Push your code to a Git repository
-2. Import your project to Vercel
-3. Configure environment variables
-4. Deploy!
+1. Build the Docker image:
 
-For other deployment options, refer to the [Next.js deployment documentation](https://nextjs.org/docs/app/building-your-application/deploying).
+   ```bash
+   docker build -t agentscan-frontend .
+   ```
+
+2. Run the container:
+   ```bash
+   docker run -p 3000:3000 \
+     -e NEXT_PUBLIC_TEAM_ID=your-team-id \
+     -e NEXT_PUBLIC_API_URL=your-api-url \
+     -e NEXT_PUBLIC_PRIVY_APP_ID=your-privy-app-id \
+     agentscan-frontend
+   ```
+
+The application will be available at `http://localhost:3000` (or your configured host).
 
 ## 📝 Code Conventions
 
@@ -106,4 +120,3 @@ For other deployment options, refer to the [Next.js deployment documentation](ht
 ## License
 
 This project is licensed under the MIT License - see the [LICENSE](LICENSE) file for details.
-

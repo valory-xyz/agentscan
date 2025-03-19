@@ -2,10 +2,9 @@
 /* eslint-disable @typescript-eslint/no-unused-vars */
 import { useState } from "react";
 import { useToast } from "./use-toast";
-import { logEvent } from "@/lib/amplitude";
 import { useAuth } from "./use-auth";
 import { useAgent } from "@/contexts/AgentContext";
-
+import { env } from "next-runtime-env";
 interface UseMessagesProps {
   teamId?: string;
   instanceId?: string;
@@ -38,7 +37,7 @@ export function useMessages({
 
     try {
       const response = await fetch(
-        `${process.env.NEXT_PUBLIC_API_URL}/conversation`,
+        `${env("NEXT_PUBLIC_API_URL")}/conversation`,
         {
           method: "POST",
           headers: {
@@ -69,18 +68,6 @@ export function useMessages({
         return;
       }
 
-      try {
-        logEvent("conversation_made", {
-          teamId: teamId || "",
-          question: message,
-          source: "web",
-          messages: messages,
-          ...(type === "agent" && { type, instance: instanceId }),
-          type,
-        });
-      } catch (error: any) {
-        console.error("Error logging event:", error);
-      }
 
       if (!response.ok) throw new Error("Network response was not ok");
 
@@ -124,18 +111,6 @@ export function useMessages({
         }
       }
 
-      try {
-        logEvent("conversation_completed", {
-          teamId: teamId || "",
-          question: message,
-          source: "web",
-          answer: fullContent,
-          type,
-          ...(type === "agent" && { instance: instanceId }),
-        });
-      } catch (error) {
-        console.error("Error logging completion event:", error);
-      }
     } catch (error) {
       console.error("Error:", error);
       toast({

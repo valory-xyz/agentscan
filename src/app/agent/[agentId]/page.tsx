@@ -1,6 +1,7 @@
 /* eslint-disable @typescript-eslint/no-explicit-any */
 "use client";
 import { useState, useEffect, use, useRef, useCallback } from "react";
+import { env } from "next-runtime-env";
 import ChatComponent from "@/components/ChatComponent";
 
 import Link from "next/link";
@@ -97,7 +98,7 @@ export default function AgentPage({
   const [transactions, setTransactions] = useState<Transaction[]>([]);
   const [loading, setLoading] = useState(true);
   const { messages, sendMessage } = useMessages({
-    teamId: process.env.NEXT_PUBLIC_TEAM_ID,
+    teamId: env("NEXT_PUBLIC_TEAM_ID"),
     instanceId: agentId,
     type: "agent",
   });
@@ -123,7 +124,7 @@ export default function AgentPage({
 
   const fetchTransactions = useCallback(
     async (cursor?: string) => {
-      const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/transactions`);
+      const url = new URL(`${env("NEXT_PUBLIC_API_URL")}/transactions`);
       url.searchParams.append("instance", agentId);
       if (cursor) {
         url.searchParams.append("cursor", cursor);
@@ -149,7 +150,7 @@ export default function AgentPage({
   useEffect(() => {
     const fetchInstance = async () => {
       try {
-        const url = new URL(`${process.env.NEXT_PUBLIC_API_URL}/instance`);
+        const url = new URL(`${env("NEXT_PUBLIC_API_URL")}/instance`);
         url.searchParams.append("id", agentId);
 
         const response = await fetch(url.toString());

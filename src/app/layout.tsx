@@ -1,4 +1,6 @@
+import { PublicEnvScript } from "next-runtime-env";
 import localFont from "next/font/local";
+
 import "./globals.css";
 
 import ClientLayout from "./ClientLayout";
@@ -85,6 +87,9 @@ export default function RootLayout({
 }>) {
   return (
     <html lang="en">
+      <head>
+        <PublicEnvScript />
+      </head>
       <body>
         <ClientLayout
           geistSansVariable={geistSans.variable}
